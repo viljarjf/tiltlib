@@ -2,14 +2,17 @@ from __future__ import annotations
 import numpy as np
 from orix.vector import Vector3d
 
+
 def test_import():
     from tiltlib.sample_holder import Axis
+
 
 def test_init():
     from tiltlib.sample_holder import Axis
 
     a = Axis(Vector3d.xvector(), 0, 0)
     b = Axis(Vector3d(np.random.random(3)), 0, 0)
+
 
 def test_degree():
     from tiltlib.sample_holder import Axis
@@ -23,6 +26,7 @@ def test_degree():
     assert ma != v.max
     assert np.isclose(np.deg2rad(mi), v.min)
     assert np.isclose(np.deg2rad(ma), v.max)
+
 
 def test_copy():
     from tiltlib.sample_holder import Axis
@@ -40,4 +44,3 @@ def test_copy():
     b.direction *= 2
     assert a.direction != b.direction
     assert a != b
-

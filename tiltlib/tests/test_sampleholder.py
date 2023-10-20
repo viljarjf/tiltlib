@@ -5,8 +5,10 @@ from orix.vector import Vector3d
 
 from utils import vec_eq, x, y, z
 
+
 def test_import():
     from tiltlib.sample_holder import SampleHolder
+
 
 def test_init():
     from tiltlib.sample_holder import SampleHolder
@@ -16,6 +18,7 @@ def test_init():
 
     ax1 = Axis(x, 0, 0)
     b = SampleHolder((ax1,))
+
 
 def test_add_axis():
     from tiltlib.sample_holder import SampleHolder, Axis
@@ -31,6 +34,7 @@ def test_add_axis():
 
     assert ax1 in b.axes
     assert ax2 in b.axes
+
 
 def test_rotate_api():
     from tiltlib.sample_holder import SampleHolder, Axis
@@ -63,6 +67,7 @@ def test_rotate_api():
     b.rotate(-45, 0, degrees=True)
 
     assert np.allclose(b.to_matrix(), np.eye(3))
+
 
 def test_rotate_rotations():
     from tiltlib.sample_holder import SampleHolder, Axis
@@ -104,6 +109,7 @@ def test_intrinsic():
 
     # assert np.allclose(b.to_matrix(), [[0, 0, 1], [-1, 0, 0], [0, -1, 0]])
 
+
 def test_extrinsic():
     from tiltlib.sample_holder import SampleHolder, Axis
 
@@ -124,12 +130,13 @@ def test_extrinsic():
     assert vec_eq(b.TEM_frame_to_sample_frame(x), y)
     assert vec_eq(b.TEM_frame_to_sample_frame(y), x)
     assert vec_eq(b.TEM_frame_to_sample_frame(z), -z)
-    
+
     b.rotate(0, 90, degrees=True)
 
     assert vec_eq(b.TEM_frame_to_sample_frame(x), -z)
     assert vec_eq(b.TEM_frame_to_sample_frame(y), x)
     assert vec_eq(b.TEM_frame_to_sample_frame(z), -y)
+
 
 def test_compare_to_scipy(n_tests: int = 100):
     from scipy.spatial.transform import Rotation
@@ -145,10 +152,10 @@ def test_compare_to_scipy(n_tests: int = 100):
     }
 
     rng = np.random.default_rng(0)
-    
+
     for _ in range(n_tests):
         t1, t2, t3 = rng.random(3) * 2 - 1
-        
+
         possible_axes = ["X", "Y", "Z"]
 
         # need different consecutive axes
@@ -160,12 +167,14 @@ def test_compare_to_scipy(n_tests: int = 100):
             chosen_axes.append(next_axis)
 
         order = "".join(chosen_axes)
-    
+
         # intrinsic
         r = Rotation.from_euler(order, (t1, t2, t3))
         sh = SampleHolder([axes[a] for a in order])
         sh.rotate(t1, t2, t3)
         assert np.allclose(r.as_matrix(), sh.as_matrix())
+
+        assert np.allclose(r.apply([1, 0, 0]), sh.sample_frame_to_TEM_frame(x).data)
 
         # # extrinsic
         order = order.lower()
@@ -174,19 +183,19 @@ def test_compare_to_scipy(n_tests: int = 100):
         sh.rotate(t1, t2, t3)
         assert np.allclose(r.as_matrix(), sh.as_matrix())
 
+
 def test_compare_to_orix():
     from orix.quaternion import Rotation
+
     a = Rotation.from_axes_angles((0, 0, -1), 90, degrees=True)
     assert np.allclose(a.to_matrix(), [[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
 
     from tiltlib.sample_holder import SampleHolder, Axis
+
     b = SampleHolder([Axis(-z, 0, 0)])
     b.rotate(90, degrees=True)
 
     assert np.allclose(b.to_matrix(), [[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
-
-    print("test")
-    print(b.TEM_frame_to_sample_frame(x))
 
 
 def test_reset_rotation():
@@ -204,6 +213,7 @@ def test_reset_rotation():
     b.reset_rotation()
     assert np.allclose(b.rotation_matrix(), np.eye(3))
 
+
 def test_DoubleTiltHolder():
     from tiltlib.sample_holder import DoubleTiltHolder, Axis
 
@@ -218,6 +228,7 @@ def test_DoubleTiltHolder():
     with pytest.raises(NotImplementedError):
         ax1 = Axis(x, 0, 0)
         a.add_rotation_axis(ax1)
+
 
 def test_RotationHolder():
     from tiltlib.sample_holder import RotationHolder, Axis
