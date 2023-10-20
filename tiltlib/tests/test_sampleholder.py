@@ -212,35 +212,3 @@ def test_reset_rotation():
 
     b.reset_rotation()
     assert np.allclose(b.rotation_matrix(), np.eye(3))
-
-
-def test_DoubleTiltHolder():
-    from tiltlib.sample_holder import DoubleTiltHolder, Axis
-
-    a = DoubleTiltHolder()
-
-    a.rotate_to(90, 0, degrees=True)
-
-    m = a.to_matrix()
-
-    assert np.allclose(m, [[0, 0, 1], [0, 1, 0], [-1, 0, 0]])
-
-    with pytest.raises(NotImplementedError):
-        ax1 = Axis(x, 0, 0)
-        a.add_rotation_axis(ax1)
-
-
-def test_RotationHolder():
-    from tiltlib.sample_holder import RotationHolder, Axis
-
-    a = RotationHolder()
-
-    a.rotate_to(90, 0, degrees=True)
-
-    m = a.to_matrix()
-
-    assert np.allclose(m, [[0, -1, 0], [1, 0, 0], [0, 0, 1]])
-
-    with pytest.raises(NotImplementedError):
-        ax1 = Axis(x, 0, 0)
-        a.add_rotation_axis(ax1)

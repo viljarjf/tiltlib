@@ -60,7 +60,7 @@ class SampleHolder:
         if len(angles) < len(self.angles):
             raise ValueError(
                 f"Too few angles. Expexted {len(self.angles)}, got {len(angles)}"
-            )        
+            )
         if not all(isinstance(angle, (float, int)) for angle in angles):
             raise ValueError("All angles must be numeric")
 
@@ -116,39 +116,3 @@ class SampleHolder:
 
     def TEM_frame_to_sample_frame(self, v: Vector3d) -> Vector3d:
         return ~self._rotation * v
-
-
-class DoubleTiltHolder(SampleHolder):
-    def __init__(self) -> None:
-        super().__init__()
-        self.add_rotation_axis(Axis(Vector3d.yvector(), 0, 0))
-        self.add_rotation_axis(Axis(Vector3d.xvector(), 0, 0))
-
-        def _add_rotation_axis(*args) -> None:
-            raise NotImplementedError("Axes already defined")
-
-        self.add_rotation_axis = _add_rotation_axis
-
-    def set_y_tilt_limits(self, min: float, max: float, degrees: bool = True):
-        self.axes[0].min = min
-        self.axes[0].max = max
-        self.axes[0].degrees = degrees
-        self.axes[0].__post_init__()
-
-    def set_x_tilt_limits(self, min: float, max: float, degrees: bool = True):
-        self.axes[1].min = min
-        self.axes[1].max = max
-        self.axes[1].degrees = degrees
-        self.axes[1].__post_init__()
-
-
-class RotationHolder(SampleHolder):
-    def __init__(self) -> None:
-        super().__init__()
-        self.add_rotation_axis(Axis(Vector3d.zvector(), 0, 0))
-        self.add_rotation_axis(Axis(Vector3d.xvector(), 0, 0))
-
-        def _add_rotation_axis(*args) -> None:
-            raise NotImplementedError("Axes already defined")
-
-        self.add_rotation_axis = _add_rotation_axis
