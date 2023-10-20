@@ -141,10 +141,10 @@ class SampleHolderRotationGenerator(RotationGenerator):
         self.sampleholder = SampleHolder()
 
         T2 = Vector3d.yvector().rotate(Vector3d.xvector(), self.alpha_0)
-        self.sampleholder.add_rotation_axis(Axis(T2, 0, 0, intrinsic=False))
+        self.sampleholder.add_rotation_axis(Axis(T2, 0, 0, intrinsic=True))
 
         T1 = Vector3d.xvector()
-        self.sampleholder.add_rotation_axis(Axis(T1, 0, 0, intrinsic=True))
+        self.sampleholder.add_rotation_axis(Axis(T1, 0, 0, intrinsic=False))
 
         self.sampleholder.rotate(self.beta, self.alpha)
 

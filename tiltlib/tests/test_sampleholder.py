@@ -136,12 +136,12 @@ def test_compare_to_scipy(n_tests: int = 100):
     from tiltlib.sample_holder import SampleHolder, Axis
 
     axes = {
-        "x": Axis(x, 0, 0, intrinsic=True),
-        "X": Axis(x, 0, 0, intrinsic=False),
-        "y": Axis(y, 0, 0, intrinsic=True),
-        "Y": Axis(y, 0, 0, intrinsic=False),
-        "z": Axis(z, 0, 0, intrinsic=True),
-        "Z": Axis(z, 0, 0, intrinsic=False),
+        "x": Axis(x, 0, 0, intrinsic=False),
+        "X": Axis(x, 0, 0, intrinsic=True),
+        "y": Axis(y, 0, 0, intrinsic=False),
+        "Y": Axis(y, 0, 0, intrinsic=True),
+        "z": Axis(z, 0, 0, intrinsic=False),
+        "Z": Axis(z, 0, 0, intrinsic=True),
     }
 
     rng = np.random.default_rng(0)
