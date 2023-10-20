@@ -91,7 +91,6 @@ class SampleHolder:
         R = self._rotation
 
         for axis in self.axes:
-            print(axis.direction, axis.angle)
             r = Rotation.from_axes_angles(axis.direction, axis.angle)
 
             if axis.extrinsic:
