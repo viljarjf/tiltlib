@@ -45,9 +45,14 @@ class SampleHolder:
         return [axis.angle for axis in self.axes]
 
     @angles.setter
-    def angles(self, *angles: float):
+    def angles(self, angles: list[float]):
+        self._check_angles(*angles)
+        for i, angle in enumerate(angles):
+            self.axes[i].angle = angle
+
+    def _check_angles(self, *angles: float) -> None:
         if len(angles) == 1 and isinstance(angles, (list, tuple, np.ndarray)):
-            angles = list(angles[0])
+            angles = [angles[0]]
         if len(angles) > len(self.angles):
             raise ValueError(
                 f"Too many angles. Expexted {len(self.angles)}, got {len(angles)}"
@@ -55,12 +60,9 @@ class SampleHolder:
         if len(angles) < len(self.angles):
             raise ValueError(
                 f"Too few angles. Expexted {len(self.angles)}, got {len(angles)}"
-            )
+            )        
         if not all(isinstance(angle, (float, int)) for angle in angles):
             raise ValueError("All angles must be numeric")
-
-        for i, angle in enumerate(angles):
-            self.axes[i].angle = angle
 
     def reset_rotation(self):
         self.angles = [0 for _ in self.axes]
@@ -74,9 +76,7 @@ class SampleHolder:
     def rotate_to(self, *angles: float, degrees: bool = False):
         if degrees:
             angles = np.deg2rad(angles)
-        # Performs the checks
-        self.angles = angles
-
+        self._check_angles(*angles)
         self.reset_rotation()
         self.angles = angles
         self._update_rotation()
@@ -94,9 +94,9 @@ class SampleHolder:
             print(axis.direction, axis.angle)
             r = Rotation.from_axes_angles(axis.direction, axis.angle)
 
-            if axis.intrinsic:
+            if axis.extrinsic:
                 R = r * R
-            elif axis.extrinsic:
+            elif axis.intrinsic:
                 R = R * r
             else:
                 print("How did we get here?")
@@ -110,7 +110,7 @@ class SampleHolder:
         return self.rotation_matrix()
 
     def as_matrix(self) -> np.ndarray:
-        return self.rotation_matrix().T
+        return self.rotation_matrix()
 
     def sample_frame_to_TEM_frame(self, v: Vector3d) -> Vector3d:
         return self._rotation * v
