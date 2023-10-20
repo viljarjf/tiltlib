@@ -1,5 +1,4 @@
 from __future__ import annotations
-from tqdm import tqdm
 import numpy as np
 import pytest
 from orix.vector import Vector3d
@@ -108,7 +107,6 @@ def test_extrinsic():
 def test_compare_to_scipy(n_tests: int = 100):
     from scipy.spatial.transform import Rotation
     from tiltlib.sample_holder import SampleHolder, Axis
-    import numpy as np
 
     axes = {
         "x": Axis(Vector3d.xvector(), 0, 0, intrinsic=False),
@@ -152,7 +150,6 @@ def test_compare_to_scipy(n_tests: int = 100):
 
 def test():
     from orix.quaternion import Rotation
-    from orix.vector import Vector3d
     r = Rotation.from_axes_angles((0, 0, -1), 90, degrees=True)
     print(r * Vector3d.xvector())
     print(r * Vector3d.yvector())

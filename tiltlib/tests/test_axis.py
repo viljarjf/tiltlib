@@ -1,7 +1,5 @@
 from __future__ import annotations
-from tqdm import tqdm
 import numpy as np
-import pytest
 from orix.vector import Vector3d
 
 def test_import():
