@@ -186,16 +186,30 @@ def test_compare_to_scipy(n_tests: int = 100):
 
 def test_compare_to_orix():
     from orix.quaternion import Rotation
-
-    a = Rotation.from_axes_angles((0, 0, -1), 90, degrees=True)
-    assert np.allclose(a.to_matrix(), [[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
-
     from tiltlib.sample_holder import SampleHolder, Axis
+
+    a1 = Rotation.from_axes_angles(-z, 90, degrees=True)
 
     b = SampleHolder([Axis(-z, 0, 0)])
     b.rotate(90, degrees=True)
 
-    assert np.allclose(b.to_matrix(), [[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
+    assert np.allclose(b.to_matrix(), a1.to_matrix())
+
+    a2 = Rotation.from_axes_angles(x, 90, degrees=True)
+    a = a2 * a1
+
+    b.add_rotation_axis(Axis(x, 0, 0, intrinsic=False))
+    b.rotate_to(90, 90, degrees=True)
+
+    vax = a * x
+    vay = a * y
+    vaz = a * z
+    vbx = b.sample_frame_to_TEM_frame(x)
+    vby = b.sample_frame_to_TEM_frame(y)
+    vbz = b.sample_frame_to_TEM_frame(z)
+    assert vec_eq(vax, vbx)
+    assert vec_eq(vay, vby)
+    assert vec_eq(vaz, vbz)
 
 
 def test_reset_rotation():
