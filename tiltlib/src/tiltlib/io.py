@@ -27,6 +27,6 @@ def get_ori_dict(fname: str) -> dict[str, list[float]]:
     :return: Grain orientation data
     :rtype: dict[str, list[float]]
     """
-    with open(fname) as f:
+    with open(fname, "r", encoding="utf-8") as f:
         ori_dict = yaml.full_load(f)
     return ori_dict
