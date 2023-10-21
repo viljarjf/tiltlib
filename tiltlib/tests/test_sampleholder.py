@@ -160,7 +160,7 @@ def test_compare_to_scipy(n_tests: int = 100):
 
         # need different consecutive axes
         chosen_axes = [rng.choice(possible_axes)]
-        for _ in range(2):
+        while len(chosen_axes) < 3:
             next_axis = rng.choice(possible_axes)
             while next_axis == chosen_axes[-1]:
                 next_axis = rng.choice(possible_axes)
