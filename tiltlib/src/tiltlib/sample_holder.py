@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Union, Iterable
 import numpy as np
 from orix.quaternion import Rotation
 from orix.vector import Vector3d
@@ -22,6 +21,13 @@ class Axis:
             self.max = np.deg2rad(self.max)
             self.degrees = False
 
+    def __repr__(self) -> str:
+        return f"""{self.__class__.__name__}:
+        direction = [{self.direction.x[0]}, {self.direction.y[0]}, {self.direction.z[0]}]
+        angle = {np.rad2deg(self.angle) :.2f} degrees
+        range: ({np.rad2deg(self.min) :.2f}, {np.rad2deg(self.max) :.2f}) degrees
+        {'intrinsic' if self.intrinsic else 'extrinsic'}"""
+
     @property
     def extrinsic(self) -> bool:
         return not self.intrinsic
@@ -39,6 +45,9 @@ class SampleHolder:
         for axis in axes:
             self.add_rotation_axis(axis)
         self._rotation = Rotation.identity()
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}:\n" + '\n'.join(str(ax) for ax in self.axes)
 
     @property
     def angles(self) -> list[float]:
