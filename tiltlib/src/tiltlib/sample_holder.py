@@ -13,13 +13,14 @@ class SampleHolder:
         """
         if axes is None:
             axes = []
+        if isinstance(axes, Axis):
+            axes = [axes]
 
         if not all(isinstance(axis, Axis) for axis in axes):
             raise ValueError("`axes` iterable can only contain `Axis` objects")
 
         self.axes = [axis.copy() for axis in axes]
         self.axes[0].extrinsic = True
-        self._initial_angles = [ax.angle for ax in self.axes]
         
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}:\n" + '\n'.join(str(ax) for ax in self.axes)
@@ -27,6 +28,10 @@ class SampleHolder:
     @property
     def angles(self) -> list[float]:
         return list(axis.angle for axis in self.axes)
+
+    @property
+    def _initial_angles(self) -> list[float]:
+        return list(axis._initial_angle for axis in self.axes)
 
     @angles.setter
     def angles(self, angles: list[float]):

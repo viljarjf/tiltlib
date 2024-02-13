@@ -20,10 +20,11 @@ class Axis:
             self.max = deg2rad(self.max)
             self.angle = deg2rad(self.angle)
             self.degrees = False
-    
+        self._initial_angle = self.angle
+
     @property
     def R(self) -> Rotation:
-        return Rotation.from_axes_angles(self.direction, self.angle)
+        return Rotation.from_axes_angles(self.direction, self.angle - self._initial_angle)
 
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}:
