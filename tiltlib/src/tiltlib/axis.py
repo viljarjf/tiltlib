@@ -24,14 +24,7 @@ class Axis:
 
     @property
     def R(self) -> Rotation:
-        R = Rotation.from_axes_angles(self.direction, self.angle - self._initial_angle)
-        print(
-            "request", rad2deg(self.angle), 
-            "initial", rad2deg(self._initial_angle),
-            "actual", rad2deg(R.angle),
-            # f"direction [{R.axis.x[0]}, {R.axis.y[0]}, {R.axis.z[0]}]", 
-            )
-        return R
+        return Rotation.from_axes_angles(self.direction, self.angle - self._initial_angle)
 
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}:

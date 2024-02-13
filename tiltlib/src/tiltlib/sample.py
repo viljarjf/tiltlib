@@ -12,7 +12,7 @@ class Sample(SampleHolder):
         self._original_rotations = Rotation(xmap._rotations.data.copy())
 
     def _update_xmap(self):
-        self.xmap._rotations[...] = self._original_rotations * self._rotation
+        self.xmap._rotations[...] = self._original_rotations * ~self._rotation
 
     def rotate_to(self, *angles: float, degrees: bool = False):
         SampleHolder.rotate_to(self, *angles, degrees=degrees)
