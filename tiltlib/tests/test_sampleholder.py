@@ -12,16 +12,11 @@ def test_import():
 
 def test_init():
     from tiltlib.sample_holder import SampleHolder
-
-    a = SampleHolder()
-    from tiltlib.sample_holder import Axis
+    from tiltlib.axis import Axis
 
     ax1 = Axis(x, 0, 0)
     b = SampleHolder((ax1,))
-
-
-def test_add_axis():
-    from tiltlib.sample_holder import SampleHolder, Axis
+    assert isinstance(b, SampleHolder)
 
     ax1 = Axis(x, 0, 0)
     ax2 = Axis(y, 0, 0)
@@ -30,20 +25,13 @@ def test_add_axis():
     assert ax1 in b.axes
     assert ax2 not in b.axes
 
-    b.add_rotation_axis(ax2)
-
-    assert ax1 in b.axes
-    assert ax2 in b.axes
-
 
 def test_rotate_api():
     from tiltlib.sample_holder import SampleHolder, Axis
 
-    ax1 = Axis(x, 0, 0, intrinsic=False)
-    ax2 = Axis(y, 0, 0, intrinsic=True)
-    b = SampleHolder()
-    b.add_rotation_axis(ax1)
-    b.add_rotation_axis(ax2)
+    ax1 = Axis(x, -50, 50, intrinsic=False)
+    ax2 = Axis(y, -50, 50, intrinsic=True)
+    b = SampleHolder((ax1, ax2))
 
     # too few angles
     with pytest.raises(ValueError):
@@ -51,7 +39,7 @@ def test_rotate_api():
 
     # too many angles
     with pytest.raises(ValueError):
-        b.rotate(1, 2, 3)
+        b.rotate(1, 2, 3, degrees=True)
 
     prev = b._rotation
     b.rotate_to(0, 0)
@@ -72,7 +60,7 @@ def test_rotate_api():
 def test_rotate_rotations():
     from tiltlib.sample_holder import SampleHolder, Axis
 
-    ax1 = Axis(x, 0, 0, intrinsic=True)
+    ax1 = Axis(x, -90, 90, intrinsic=True)
     b = SampleHolder([ax1])
 
     b.rotate_to(90, degrees=True)
@@ -81,9 +69,9 @@ def test_rotate_rotations():
     assert vec_eq(b.TEM_frame_to_sample_frame(y), -z)
     assert vec_eq(b.TEM_frame_to_sample_frame(z), y)
 
-    ax2 = Axis(y, 0, 0, intrinsic=True)
+    ax2 = Axis(y, -90, 90, intrinsic=True)
 
-    b.add_rotation_axis(ax2)
+    b = SampleHolder([ax1, ax2])
 
     b.rotate_to(90, 90, degrees=True)
 
@@ -92,63 +80,36 @@ def test_rotate_rotations():
     assert vec_eq(b.TEM_frame_to_sample_frame(z), y)
 
 
-def test_intrinsic():
+def test_compare_to_manual():
     from tiltlib.sample_holder import SampleHolder, Axis
 
-    ax1 = Axis(x, 0, 0, intrinsic=True)
-    ax2 = Axis(y, 0, 0, intrinsic=True)
-    b = SampleHolder()
-    b.add_rotation_axis(ax1)
-    b.add_rotation_axis(ax2)
+    ax1 = Axis(x, -90, 90, intrinsic=True)
+    ax2 = Axis(y, -90, 90, intrinsic=True)
+    b = SampleHolder([ax1, ax2])
 
     b.rotate_to(90, 90, degrees=True)
 
     assert vec_eq(b.TEM_frame_to_sample_frame(x), z)
-
-    b.rotate(-90, 90, degrees=True)
-
-    # assert np.allclose(b.to_matrix(), [[0, 0, 1], [-1, 0, 0], [0, -1, 0]])
-
-
-def test_extrinsic():
-    from tiltlib.sample_holder import SampleHolder, Axis
-
-    ax1 = Axis(x, 0, 0, intrinsic=False)
-    ax2 = Axis(y, 0, 0, intrinsic=False)
-    b = SampleHolder()
-    b.add_rotation_axis(ax1)
-    b.add_rotation_axis(ax2)
-
-    b.rotate_to(-90, -90, degrees=True)
-
-    assert vec_eq(b.TEM_frame_to_sample_frame(x), y)
-    assert vec_eq(b.TEM_frame_to_sample_frame(y), z)
-    assert vec_eq(b.TEM_frame_to_sample_frame(z), x)
+    assert vec_eq(b.TEM_frame_to_sample_frame(y), x)
+    assert vec_eq(b.TEM_frame_to_sample_frame(z), y)
 
     b.rotate(-90, 0, degrees=True)
+    # Note: first axis is always extrinsic
+    assert vec_eq(b.TEM_frame_to_sample_frame(x), z)
+    assert vec_eq(b.TEM_frame_to_sample_frame(y), y)
+    assert vec_eq(b.TEM_frame_to_sample_frame(z), -x)
 
-    assert vec_eq(b.TEM_frame_to_sample_frame(x), y)
-    assert vec_eq(b.TEM_frame_to_sample_frame(y), x)
-    assert vec_eq(b.TEM_frame_to_sample_frame(z), -z)
-
-    b.rotate(0, 90, degrees=True)
-
-    assert vec_eq(b.TEM_frame_to_sample_frame(x), -z)
-    assert vec_eq(b.TEM_frame_to_sample_frame(y), x)
-    assert vec_eq(b.TEM_frame_to_sample_frame(z), -y)
-
-
-def test_compare_to_scipy(n_tests: int = 100):
+def test_compare_to_scipy_euler(n_tests: int = 100):
     from scipy.spatial.transform import Rotation
     from tiltlib.sample_holder import SampleHolder, Axis
 
     axes = {
-        "x": Axis(x, 0, 0, intrinsic=False),
-        "X": Axis(x, 0, 0, intrinsic=True),
-        "y": Axis(y, 0, 0, intrinsic=False),
-        "Y": Axis(y, 0, 0, intrinsic=True),
-        "z": Axis(z, 0, 0, intrinsic=False),
-        "Z": Axis(z, 0, 0, intrinsic=True),
+        "x": Axis(x, -90, 90, intrinsic=False),
+        "X": Axis(x, -90, 90, intrinsic=True),
+        "y": Axis(y, -90, 90, intrinsic=False),
+        "Y": Axis(y, -90, 90, intrinsic=True),
+        "z": Axis(z, -90, 90, intrinsic=False),
+        "Z": Axis(z, -90, 90, intrinsic=True),
     }
 
     rng = np.random.default_rng(0)
@@ -190,7 +151,7 @@ def test_compare_to_orix():
 
     a1 = Rotation.from_axes_angles(-z, 90, degrees=True)
 
-    b = SampleHolder([Axis(-z, 0, 0)])
+    b = SampleHolder([Axis(-z, -90, 90)])
     b.rotate(90, degrees=True)
 
     assert np.allclose(b.to_matrix(), a1.to_matrix())
@@ -198,7 +159,7 @@ def test_compare_to_orix():
     a2 = Rotation.from_axes_angles(x, 90, degrees=True)
     a = a2 * a1
 
-    b.add_rotation_axis(Axis(x, 0, 0, intrinsic=False))
+    b = SampleHolder([b.axes[0], Axis(x, -90, 90, intrinsic=False)])
     b.rotate_to(90, 90, degrees=True)
 
     vax = a * x
@@ -215,11 +176,9 @@ def test_compare_to_orix():
 def test_reset_rotation():
     from tiltlib.sample_holder import SampleHolder, Axis
 
-    ax1 = Axis(x, 0, 0)
-    ax2 = Axis(y, 0, 0)
-    b = SampleHolder()
-    b.add_rotation_axis(ax1)
-    b.add_rotation_axis(ax2)
+    ax1 = Axis(x, -90, 90)
+    ax2 = Axis(y, -90, 90)
+    b = SampleHolder([ax1, ax2])
 
     b.rotate_to(10, 20, degrees=True)
     assert not np.allclose(b.rotation_matrix(), np.eye(3))
