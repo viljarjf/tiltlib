@@ -22,4 +22,4 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "tqdm", "scipy"]
+test = ["pytest", "pytest-xdist", "tqdm", "scipy"]

@@ -49,4 +49,63 @@ def test_initial_angle(angle_1: float, angle_2: float):
 
     assert s1.orientations == s2.orientations
 
+    s1.rotate_to(angle_1 - 10, degrees=True)
+    s2.rotate_to(angle_2 - 10, degrees=True)
 
+    assert s1.orientations == s2.orientations
+
+def test_rotate_to():
+    s1 = Sample(get_xmap(), [Axis(x, -100, 100,  degrees=True)])
+    s2 = Sample(get_xmap(), [Axis(x, -100, 100,  degrees=True)])
+
+    assert s1.orientations == s2.orientations
+
+    s1.rotate(5, degrees=True)
+    s2.rotate_to(5, degrees=True)
+
+    assert s1.orientations == s2.orientations
+
+    s1.rotate(5, degrees=True)
+    s2.rotate_to(10, degrees=True) # 5 + 5 = 10
+
+    assert s1.orientations == s2.orientations
+
+    s1.rotate_to(-20, degrees=True)
+    s2.rotate_to(-20, degrees=True)
+
+    assert s1.orientations == s2.orientations
+
+    s1.reset_rotation()
+    s2.reset_rotation()
+
+    assert s1.orientations == s2.orientations
+
+def test_rotate_to_with_initial_angle():
+    s1 = Sample(get_xmap(), [Axis(x, -100, 100, 10,  degrees=True)])
+    s2 = Sample(get_xmap(), [Axis(x, -100, 100,  degrees=True)])
+
+    assert s1.orientations == s2.orientations
+
+    s1.rotate(-5, degrees=True)
+    s2.rotate_to(5, degrees=True)
+
+    assert all([a1 == a2 for a1, a2 in zip(s1.angles, s2.angles)])
+
+    s1.rotate(5, degrees=True)
+    s2.rotate_to(10, degrees=True)
+
+    assert all([a1 == a2 for a1, a2 in zip(s1.angles, s2.angles)])
+
+    s1.rotate_to(-20, degrees=True)
+    s2.rotate_to(-30, degrees=True)
+
+    assert s1.orientations == s2.orientations
+
+    s1.reset_rotation()
+    s2.rotate_to(10, degrees=True)
+
+    assert all([a1 == a2 for a1, a2 in zip(s1.angles, s2.angles)])
+
+    s2.reset_rotation()
+
+    assert s1.orientations == s2.orientations
