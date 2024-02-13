@@ -10,15 +10,15 @@ def test_reset_rotation(initial_angle: float):
     original_xmap = get_xmap()
     s = Sample(get_xmap(), [Axis(x, -100, 100, initial_angle,  degrees=True)])
 
-    assert s.xmap.orientations == original_xmap.orientations
+    assert s.orientations == original_xmap.orientations.reshape(*original_xmap.shape)
 
     s.rotate(50, degrees=True)
 
-    assert s.xmap.orientations != original_xmap.orientations
+    assert s.orientations != original_xmap.orientations.reshape(*original_xmap.shape)
 
     s.reset_rotation()
 
-    assert s.xmap.orientations == original_xmap.orientations
+    assert s.orientations == original_xmap.orientations.reshape(*original_xmap.shape)
 
 @pytest.mark.parametrize(
         ["angle_1", "angle_2"],
@@ -107,5 +107,24 @@ def test_rotate_to_with_initial_angle():
     assert all([a1 == a2 for a1, a2 in zip(s1.angles, s2.angles)])
 
     s2.reset_rotation()
+
+    assert s1.orientations == s2.orientations
+
+def test_rotating_to_initial_angle():
+    s1 = Sample(get_xmap(), [Axis(x, -100, 100, degrees=True)])
+
+    s1.rotate_to(5, degrees=True)
+
+    s2 = Sample(s1.xmap, [Axis(x, -100, 100, 5, degrees=True)])
+
+    assert s1.orientations == s2.orientations
+
+    s1.reset_rotation()
+    s2.rotate_to(0, degrees=True)
+
+    assert s1.orientations == s2.orientations
+
+    s1.rotate_to(10, degrees=True)
+    s2.rotate_to(10, degrees=True)
 
     assert s1.orientations == s2.orientations
