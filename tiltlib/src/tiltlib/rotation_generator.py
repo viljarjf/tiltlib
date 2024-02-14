@@ -1,10 +1,22 @@
+"""
+Test a couple different methods of generating the rotation matrix for a specific sample holder geometry, 
+namely the one in the following article:
+Kelly, P. M., Wauchope, C. J., & Zhang, X. (1994). 
+Calculation of overall tilt angles for a double tilt holder in a TEM. 
+Microscopy research and technique, 28(5), 448-451. 
+https://doi.org/10.1002/jemt.1070280512
+
+Based on work by Anders Mathisen for his Master's thesis
+"""
+
 from __future__ import annotations
+
 import numpy as np
 from scipy.spatial.transform import Rotation as SpRotation
 from orix.quaternion import Rotation
 from orix.vector import Vector3d
 
-from tiltlib.sample_holder import SampleHolder, Axis
+from tiltlib import Axis, SampleHolder
 
 
 class GonioPosition:
@@ -138,15 +150,15 @@ class SampleHolderRotationGenerator(RotationGenerator):
     ) -> None:
         super().__init__(new_gonjo_pos, old_gonjo_pos)
 
-        
-
         T2 = Vector3d.yvector().rotate(Vector3d.xvector(), self.alpha_0)
         T1 = Vector3d.xvector()
-        
-        self.sampleholder = SampleHolder([
-            Axis(T2, -300, 300, intrinsic=True),
-            Axis(T1, -300, 300, intrinsic=False),
-        ])
+
+        self.sampleholder = SampleHolder(
+            [
+                Axis(T2, -300, 300, intrinsic=True),
+                Axis(T1, -300, 300, intrinsic=False),
+            ]
+        )
         self.sampleholder.rotate(self.beta, self.alpha)
 
     @property

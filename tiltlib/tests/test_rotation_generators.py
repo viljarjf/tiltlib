@@ -1,10 +1,11 @@
 from __future__ import annotations
-from tqdm import tqdm
+
 import numpy as np
+from tqdm import tqdm
 
 
 def test_rotation_generators(n_tests: int = 100, verbose=False):
-    from tiltlib.rotation_generator import RotationGenerator, GonioPosition
+    from tiltlib.rotation_generator import GonioPosition, RotationGenerator
 
     rotgens = RotationGenerator.get_subclasses()
     test_range = range(n_tests)

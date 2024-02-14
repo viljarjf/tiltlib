@@ -1,8 +1,9 @@
+import copy
+from dataclasses import dataclass
+
+from numpy import deg2rad, rad2deg
 from orix.quaternion import Rotation
 from orix.vector import Vector3d
-from dataclasses import dataclass
-import copy
-from numpy import deg2rad, rad2deg
 
 
 @dataclass
@@ -24,7 +25,9 @@ class Axis:
 
     @property
     def R(self) -> Rotation:
-        return Rotation.from_axes_angles(self.direction, self.angle - self._initial_angle)
+        return Rotation.from_axes_angles(
+            self.direction, self.angle - self._initial_angle
+        )
 
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}:
@@ -36,7 +39,7 @@ class Axis:
     @property
     def extrinsic(self) -> bool:
         return not self.intrinsic
-    
+
     @extrinsic.setter
     def extrinsic(self, b: bool):
         self.intrinsic = not b

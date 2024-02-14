@@ -1,19 +1,27 @@
-from orix.crystal_map import CrystalMap
-from tiltlib.sample_holder import Axis, SampleHolder
-from orix.quaternion import Orientation, Rotation
+from __future__ import annotations
+
 import numpy as np
-from orix.plot import IPFColorKeyTSL
-from orix.vector import Vector3d
 from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider
+from orix.crystal_map import CrystalMap
+from orix.plot import IPFColorKeyTSL
+from orix.quaternion import Orientation, Rotation
+from orix.vector import Vector3d
+
+from tiltlib.sample_holder import Axis, SampleHolder
 
 
 class Sample(SampleHolder):
-    
     def __init__(self, xmap: CrystalMap, axes: list[Axis] = None) -> None:
         SampleHolder.__init__(self, axes)
         self.xmap = xmap.deepcopy()
         self._original_rotations = Rotation(xmap._rotations.data.copy())
+
+    @classmethod
+    def from_sampleholder(
+        cls, xmap: CrystalMap, sampleholder: SampleHolder
+    ) -> "Sample":
+        return cls(xmap, sampleholder.axes)
 
     def _update_xmap(self):
         self.xmap._rotations[...] = self._original_rotations * ~self._rotation
@@ -23,12 +31,17 @@ class Sample(SampleHolder):
         self._update_xmap()
 
     # TODO fix coordinates changing in the xmap maybe
-    
+
     @property
     def orientations(self) -> Orientation:
         return self.xmap.orientations.reshape(*self.xmap.shape)
-    
+
     def plot(self) -> plt.Figure:
+        """Plot IPFs of the orientations at the given tilt angle(s)
+
+        Returns:
+            plt.Figure:
+        """
         oris = self.orientations
         symmetry = oris.symmetry
         ipfkey_x = IPFColorKeyTSL(symmetry, direction=Vector3d.xvector())
@@ -52,26 +65,22 @@ class Sample(SampleHolder):
         ax.set_title("IPF z")
         ax.axis("off")
 
+        fig.tight_layout()
         return fig
-    
+
     def plot_interactive(self) -> tuple[plt.Figure, Slider]:
-        """Return the slider too to keep it working"""
+        """Make a IPF plot with a slider for the tilt angle of each tilt axis
+
+        Returns:
+            tuple[plt.Figure, tuple[Slider, ...]]: The figure, and a tuple of all the sliders
+
+        Note:
+            The sliders are returned with the figure to avoid their functionality being deleted when the function returns
+        """
 
         fig, ax = plt.subplots(1, 3, sharex="all", sharey="all")
         ax: tuple[plt.Axes, ...]
         (x_ax, y_ax, z_ax) = ax
-
-        slider_ax = fig.add_axes([0.3, 0.05, 0.4, 0.05])
-
-        tilt_slider = Slider(
-            slider_ax, 
-            'Tilt angle [deg]', 
-            valmin=np.rad2deg(self.axes[0].min), 
-            valmax=np.rad2deg(self.axes[0].max), 
-            valinit=np.rad2deg(self.axes[0].angle), 
-            valfmt='%.2f', 
-            facecolor='#cc7000'
-            )
 
         oris = self.orientations
         symmetry = oris.symmetry
@@ -91,15 +100,30 @@ class Sample(SampleHolder):
         z_ax.set_title("IPF z")
         z_ax.axis("off")
 
-        def update(tilt_angle: float):
-            self.rotate_to(tilt_angle, degrees=True)
+        sliders: list[Slider] = []
+
+        def update(_: float):
+            self.rotate_to(*[slider.val for slider in sliders], degrees=True)
             x_im.set_data(ipfkey_x.orientation2color(self.orientations))
             y_im.set_data(ipfkey_y.orientation2color(self.orientations))
             z_im.set_data(ipfkey_z.orientation2color(self.orientations))
             fig.canvas.draw_idle()
 
-        tilt_slider.on_changed(update)
+        for i, tilt_axis in enumerate(self.axes):
+            slider_ax = fig.add_axes([0.3, 0.05 + 0.1 * i, 0.4, 0.05])
+
+            tilt_slider = Slider(
+                slider_ax,
+                "Tilt angle [deg]",
+                valmin=np.rad2deg(tilt_axis.min),
+                valmax=np.rad2deg(tilt_axis.max),
+                valinit=np.rad2deg(tilt_axis.angle),
+                valfmt="%.2f",
+                facecolor="#cc7000",
+            )
+            tilt_slider.on_changed(update)
+            sliders.append(tilt_slider)
 
         fig.tight_layout()
 
-        return fig, tilt_slider
+        return fig, tuple(sliders)

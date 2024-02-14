@@ -1,7 +1,7 @@
 from __future__ import annotations
+
 import numpy as np
 import pytest
-from orix.vector import Vector3d
 
 from utils import vec_eq, x, y, z
 
@@ -11,8 +11,8 @@ def test_import():
 
 
 def test_init():
-    from tiltlib.sample_holder import SampleHolder
     from tiltlib.axis import Axis
+    from tiltlib.sample_holder import SampleHolder
 
     ax1 = Axis(x, 0, 0)
     b = SampleHolder((ax1,))
@@ -27,7 +27,7 @@ def test_init():
 
 
 def test_rotate_api():
-    from tiltlib.sample_holder import SampleHolder, Axis
+    from tiltlib.sample_holder import Axis, SampleHolder
 
     ax1 = Axis(x, -50, 50, intrinsic=False)
     ax2 = Axis(y, -50, 50, intrinsic=True)
@@ -58,7 +58,7 @@ def test_rotate_api():
 
 
 def test_rotate_rotations():
-    from tiltlib.sample_holder import SampleHolder, Axis
+    from tiltlib.sample_holder import Axis, SampleHolder
 
     ax1 = Axis(x, -90, 90, intrinsic=True)
     b = SampleHolder([ax1])
@@ -81,7 +81,7 @@ def test_rotate_rotations():
 
 
 def test_compare_to_manual():
-    from tiltlib.sample_holder import SampleHolder, Axis
+    from tiltlib.sample_holder import Axis, SampleHolder
 
     ax1 = Axis(x, -90, 90, intrinsic=True)
     ax2 = Axis(y, -90, 90, intrinsic=True)
@@ -99,9 +99,11 @@ def test_compare_to_manual():
     assert vec_eq(b.TEM_frame_to_sample_frame(y), y)
     assert vec_eq(b.TEM_frame_to_sample_frame(z), -x)
 
+
 def test_compare_to_scipy_euler(n_tests: int = 100):
     from scipy.spatial.transform import Rotation
-    from tiltlib.sample_holder import SampleHolder, Axis
+
+    from tiltlib.sample_holder import Axis, SampleHolder
 
     axes = {
         "x": Axis(x, -90, 90, intrinsic=False),
@@ -147,7 +149,7 @@ def test_compare_to_scipy_euler(n_tests: int = 100):
 
 def test_compare_to_orix():
     from orix.quaternion import Rotation
-    from tiltlib.sample_holder import SampleHolder, Axis
+    from tiltlib.sample_holder import Axis, SampleHolder
 
     a1 = Rotation.from_axes_angles(-z, 90, degrees=True)
 
@@ -174,7 +176,7 @@ def test_compare_to_orix():
 
 
 def test_reset_rotation():
-    from tiltlib.sample_holder import SampleHolder, Axis
+    from tiltlib.sample_holder import Axis, SampleHolder
 
     ax1 = Axis(x, -90, 90)
     ax2 = Axis(y, -90, 90)
