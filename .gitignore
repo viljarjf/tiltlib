@@ -2,3 +2,4 @@
 .venv
 .conda
 *.egg-info
+__pycache__
