@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 
 def test_rotation_generators(n_tests: int = 100, verbose=False):
-    from tiltlib.rotation_generator import GonioPosition, RotationGenerator
+    from tests.rotation_generator import GonioPosition, RotationGenerator
 
     rotgens = RotationGenerator.get_subclasses()
     test_range = range(n_tests)
