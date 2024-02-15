@@ -18,8 +18,8 @@ classifiers = [
 dependencies = [
     "numpy",
     "orix",
-    "pyyaml"
+    "matplotlib",
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-xdist", "tqdm", "scipy"]
+test = ["pytest", "pytest-xdist", "scipy"]
