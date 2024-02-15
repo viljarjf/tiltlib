@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from utils import vec_eq, x, y, z
+from .conftest import vec_eq, x, y, z
 
 
 def test_import():

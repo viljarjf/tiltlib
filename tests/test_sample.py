@@ -1,5 +1,5 @@
 import pytest
-from utils import default_xmap, x
+from .conftest import default_xmap, x
 
 from tiltlib import Axis, Sample
 
