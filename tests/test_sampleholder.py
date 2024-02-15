@@ -3,14 +3,14 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from utils import vec_eq, x, y, z
+from .conftest import vec_eq, x, y, z
 
 
 def test_import():
     from tiltlib.sample_holder import SampleHolder
 
 
-def test_init():
+def test_init(x, y, z):
     from tiltlib.axis import Axis
     from tiltlib.sample_holder import SampleHolder
 
@@ -26,7 +26,7 @@ def test_init():
     assert ax2 not in b.axes
 
 
-def test_rotate_api():
+def test_rotate_api(x, y, z):
     from tiltlib.sample_holder import Axis, SampleHolder
 
     ax1 = Axis(x, -50, 50, intrinsic=False)
@@ -57,7 +57,7 @@ def test_rotate_api():
     assert np.allclose(b.to_matrix(), np.eye(3))
 
 
-def test_rotate_rotations():
+def test_rotate_rotations(x, y, z):
     from tiltlib.sample_holder import Axis, SampleHolder
 
     ax1 = Axis(x, -90, 90, intrinsic=True)
@@ -80,7 +80,7 @@ def test_rotate_rotations():
     assert vec_eq(b.TEM_frame_to_sample_frame(z), y)
 
 
-def test_compare_to_manual():
+def test_compare_to_manual(x, y, z):
     from tiltlib.sample_holder import Axis, SampleHolder
 
     ax1 = Axis(x, -90, 90, intrinsic=True)
@@ -100,7 +100,7 @@ def test_compare_to_manual():
     assert vec_eq(b.TEM_frame_to_sample_frame(z), -x)
 
 
-def test_compare_to_scipy_euler(n_tests: int = 100):
+def test_compare_to_scipy_euler(x, y, z, n_tests: int = 100):
     from scipy.spatial.transform import Rotation
 
     from tiltlib.sample_holder import Axis, SampleHolder
@@ -147,7 +147,7 @@ def test_compare_to_scipy_euler(n_tests: int = 100):
         assert np.allclose(r.as_matrix(), sh.as_matrix())
 
 
-def test_compare_to_orix():
+def test_compare_to_orix(x, y, z):
     from orix.quaternion import Rotation
     from tiltlib.sample_holder import Axis, SampleHolder
 
@@ -175,7 +175,7 @@ def test_compare_to_orix():
     assert vec_eq(vaz, vbz)
 
 
-def test_reset_rotation():
+def test_reset_rotation(x, y, z):
     from tiltlib.sample_holder import Axis, SampleHolder
 
     ax1 = Axis(x, -90, 90)
