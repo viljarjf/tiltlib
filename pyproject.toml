@@ -19,6 +19,7 @@ dependencies = [
     "numpy",
     "orix",
     "matplotlib",
+    "hyperspy",
 ]
 
 [project.optional-dependencies]
