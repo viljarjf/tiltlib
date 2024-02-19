@@ -169,10 +169,12 @@ class Sample(SampleHolder):
         optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
 
         def angle_with(angles) -> np.ndarray:
+            """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample. Flattened output."""
             self.rotate_to(*angles, degrees=True)
             return (self.xmap.orientations * optical_axis).in_fundamental_sector().angle_with(zone_axis, degrees=True)
         
         def optimize(angles) -> float:
+            """Mean of the bottom 2/3 of angles"""
             aw = angle_with(angles)
             k = aw.size // 3 * 2
             return np.mean(np.partition(aw, k, axis=None)[:k])
@@ -184,7 +186,6 @@ class Sample(SampleHolder):
             method="Nelder-Mead", 
             # options={"maxiter": 10000},
             )
-        print(res)
 
         self.reset_rotation()
 
