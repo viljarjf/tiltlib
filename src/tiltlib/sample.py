@@ -6,7 +6,10 @@ from matplotlib.widgets import Slider
 from orix.crystal_map import CrystalMap
 from orix.plot import IPFColorKeyTSL
 from orix.quaternion import Orientation, Rotation
-from orix.vector import Vector3d
+from orix.vector import Vector3d, Miller
+from scipy.optimize import minimize
+from hyperspy.signals import Signal1D
+from hyperspy.roi import BaseROI, CircleROI, RectangularROI
 
 from tiltlib.sample_holder import Axis, SampleHolder
 
@@ -67,6 +70,30 @@ class Sample(SampleHolder):
 
         fig.tight_layout()
         return fig
+    
+    def crop(self, roi: BaseROI) -> "Sample":
+        """Crop the sample with a hyperspy ROI and return a new cropped sample"""
+        if isinstance(roi, RectangularROI):
+            top = int(roi.top)
+            bottom = int(roi.bottom)
+            left = int(roi.left)
+            right = int(roi.right)
+            new_xmap = self.xmap[top:bottom, left:right]
+        elif isinstance(roi, CircleROI):
+            cx = int(roi.cx)
+            cy = int(roi.cy)
+            r = roi.r
+            x = np.arange(self.xmap.shape[1], dtype=float)
+            y = np.arange(self.xmap.shape[0], dtype=float)
+            x, y = np.meshgrid(x, y)
+            x -= cx
+            y -= cy
+            mask = (x**2 + y**2) < r**2
+            new_xmap = self.xmap[mask.flatten()]
+        else:
+            raise NotImplementedError("Supported ROIs are RectangularROI and CircleROI")
+        return Sample(new_xmap, self.axes)
+        
 
     def plot_interactive(self) -> tuple[plt.Figure, Slider]:
         """Make a IPF plot with a slider for the tilt angle of each tilt axis
@@ -127,3 +154,58 @@ class Sample(SampleHolder):
         fig.tight_layout()
 
         return fig, tuple(sliders)
+    
+    def find_tilt_angles(self, zone_axis: Miller) -> tuple[float, ...]:
+        """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
+
+        Args:
+            zone_axis (Miller): desired zone axis
+
+        Returns:
+            tuple[float, ...]: Tilt angles for each axis
+
+        """
+
+        optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
+
+        def angle_with(angles) -> np.ndarray:
+            self.rotate_to(*angles, degrees=True)
+            return (self.xmap.orientations * optical_axis).in_fundamental_sector().angle_with(zone_axis, degrees=True)
+        
+        def optimize(angles) -> float:
+            aw = angle_with(angles)
+            k = aw.size // 3 * 2
+            return np.mean(np.partition(aw, k, axis=None)[:k])
+
+        res = minimize(
+            optimize, 
+            self.angles, 
+            bounds=np.rad2deg([(ax.min, ax.max) for ax in self.axes]), 
+            method="Nelder-Mead", 
+            # options={"maxiter": 10000},
+            )
+        print(res)
+
+        self.reset_rotation()
+
+        return res.x
+
+
+    def to_navigator(self) -> Signal1D:
+        """Get a IPF""" 
+        # Might not actually be 2D, but the navigation signal is...
+
+        ipfkey = IPFColorKeyTSL(self.orientations.symmetry, direction=Vector3d.zvector())
+
+        float_rgb = ipfkey.orientation2color(self.orientations)
+
+        int_rgb = (float_rgb * 255).astype(np.uint8)
+        
+        s = Signal1D(int_rgb)
+
+        s.change_dtype("rgb8")
+
+        return s
+    
+    def to_signal(self) -> Signal1D:
+        return Signal1D(self.orientations.data)
