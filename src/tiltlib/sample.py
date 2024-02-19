@@ -187,7 +187,6 @@ class Sample(SampleHolder):
             self.angles,
             bounds=np.rad2deg([(ax.min, ax.max) for ax in self.axes]),
             method="Nelder-Mead",
-            # options={"maxiter": 10000},
         )
 
         self.reset_rotation()

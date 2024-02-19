@@ -20,7 +20,8 @@ dependencies = [
     "orix",
     "matplotlib",
     "hyperspy",
+    "scipy",
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-xdist", "filelock", "scipy"]
+test = ["pytest", "pytest-xdist", "filelock"]
