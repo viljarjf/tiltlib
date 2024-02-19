@@ -5,29 +5,39 @@ from filelock import FileLock
 
 import pytest
 
+
 def vec_eq(v1: Vector3d, v2: Vector3d) -> bool:
     return allclose(v1.data, v2.data)
+
 
 @pytest.fixture
 def x() -> Vector3d:
     return Vector3d.xvector()
+
+
 @pytest.fixture
 def y() -> Vector3d:
     return Vector3d.yvector()
+
+
 @pytest.fixture
 def z() -> Vector3d:
     return Vector3d.zvector()
 
+
 # Adapt https://github.com/pytest-dev/pytest/issues/1402#issuecomment-186299177
 # to avoid pytest issues with attempting to download the dataset multiple times
 
-def pytest_configure(config):        
+
+def pytest_configure(config):
     print("Start")
     if is_master(config):
         sdss_austenite(allow_download=True)
 
+
 def is_master(config):
     return hasattr(config, "workerinput")
+
 
 # Kinda hacky, but this ensures only a single download for the whole (parallel) session.
 # Taken from the xdist documentation:

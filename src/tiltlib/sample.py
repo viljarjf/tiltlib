@@ -70,7 +70,7 @@ class Sample(SampleHolder):
 
         fig.tight_layout()
         return fig
-    
+
     def crop(self, roi: BaseROI) -> "Sample":
         """Crop the sample with a hyperspy ROI and return a new cropped sample"""
         if isinstance(roi, RectangularROI):
@@ -93,7 +93,6 @@ class Sample(SampleHolder):
         else:
             raise NotImplementedError("Supported ROIs are RectangularROI and CircleROI")
         return Sample(new_xmap, self.axes)
-        
 
     def plot_interactive(self) -> tuple[plt.Figure, Slider]:
         """Make a IPF plot with a slider for the tilt angle of each tilt axis
@@ -154,7 +153,7 @@ class Sample(SampleHolder):
         fig.tight_layout()
 
         return fig, tuple(sliders)
-    
+
     def find_tilt_angles(self, zone_axis: Miller) -> tuple[float, ...]:
         """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
 
@@ -171,8 +170,12 @@ class Sample(SampleHolder):
         def angle_with(angles) -> np.ndarray:
             """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample. Flattened output."""
             self.rotate_to(*angles, degrees=True)
-            return (self.xmap.orientations * optical_axis).in_fundamental_sector().angle_with(zone_axis, degrees=True)
-        
+            return (
+                (self.xmap.orientations * optical_axis)
+                .in_fundamental_sector()
+                .angle_with(zone_axis, degrees=True)
+            )
+
         def optimize(angles) -> float:
             """Mean of the bottom 2/3 of angles"""
             aw = angle_with(angles)
@@ -180,33 +183,34 @@ class Sample(SampleHolder):
             return np.mean(np.partition(aw, k, axis=None)[:k])
 
         res = minimize(
-            optimize, 
-            self.angles, 
-            bounds=np.rad2deg([(ax.min, ax.max) for ax in self.axes]), 
-            method="Nelder-Mead", 
+            optimize,
+            self.angles,
+            bounds=np.rad2deg([(ax.min, ax.max) for ax in self.axes]),
+            method="Nelder-Mead",
             # options={"maxiter": 10000},
-            )
+        )
 
         self.reset_rotation()
 
         return res.x
 
-
     def to_navigator(self) -> Signal1D:
-        """Get a IPF""" 
+        """Get a IPF"""
         # Might not actually be 2D, but the navigation signal is...
 
-        ipfkey = IPFColorKeyTSL(self.orientations.symmetry, direction=Vector3d.zvector())
+        ipfkey = IPFColorKeyTSL(
+            self.orientations.symmetry, direction=Vector3d.zvector()
+        )
 
         float_rgb = ipfkey.orientation2color(self.orientations)
 
         int_rgb = (float_rgb * 255).astype(np.uint8)
-        
+
         s = Signal1D(int_rgb)
 
         s.change_dtype("rgb8")
 
         return s
-    
+
     def to_signal(self) -> Signal1D:
         return Signal1D(self.orientations.data)
