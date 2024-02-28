@@ -3,7 +3,11 @@
 Tilt TEM sample holders
 
 # Installation
- 
+
+To install, just run `pip install tiltlib` in your favorite environment.
+
+# Contributing
+
 Download the code with
 ~~~bash
 git clone https://github.com/viljarjf/tiltlib.git
@@ -18,9 +22,7 @@ conda activate tiltlib_env
 Install:
 ~~~bash
 cd tiltlib
-pip install .
+pip install -e .
 ~~~
 
-Note:
-In the future, you will be able to install the library with: `pip install tiltlib`
-
+Open a pull request to https://github.com/viljarjf/tiltlib.
