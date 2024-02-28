@@ -2,13 +2,13 @@
 name = "tiltlib"
 version = "0.0.1"
 authors = [
-  { name="Viljar Femoen", email="author@example.com" },
+  { name="Viljar Femoen", email="viljarjf@stud.ntnu.no" },
 ]
 description = "TEM tilt holder scripts"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Physics",
     "Programming Language :: Python :: 3",
