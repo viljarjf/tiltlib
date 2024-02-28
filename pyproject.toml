@@ -1,6 +1,6 @@
 [project]
 name = "tiltlib"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Viljar Femoen", email="viljarjf@stud.ntnu.no" },
 ]
