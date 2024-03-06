@@ -174,7 +174,7 @@ class Sample(SampleHolder):
             """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample. Flattened output."""
             self.rotate_to(*angles, degrees=True)
             return (
-                (self.xmap.orientations * optical_axis)
+                (self.orientations * optical_axis)
                 .in_fundamental_sector()
                 .angle_with(zone_axis, degrees=True)
             )
