@@ -19,6 +19,7 @@ class Sample(SampleHolder):
         SampleHolder.__init__(self, axes)
         self.xmap = xmap.deepcopy()
         self._original_rotations = Rotation(xmap._rotations.data.copy())
+        self._slices = (slice(None, None, None), slice(None, None, None))
 
     @classmethod
     def from_sampleholder(
@@ -27,7 +28,7 @@ class Sample(SampleHolder):
         return cls(xmap, sampleholder.axes)
 
     def _update_xmap(self):
-        self.xmap._rotations[...] = self._original_rotations * ~self._rotation
+        self.xmap._rotations[:, 0] = self._original_rotations[:, 0] * ~self._rotation
 
     def rotate_to(self, *angles: float, degrees: bool = False):
         SampleHolder.rotate_to(self, *angles, degrees=degrees)
@@ -37,7 +38,8 @@ class Sample(SampleHolder):
 
     @property
     def orientations(self) -> Orientation:
-        return self.xmap.orientations.reshape(*self.xmap.shape)
+        o = self.xmap.orientations.reshape(*self.xmap.shape)[self._slices]
+        return o
 
     def plot(self) -> plt.Figure:
         """Plot IPFs of the orientations at the given tilt angle(s)
@@ -73,12 +75,13 @@ class Sample(SampleHolder):
 
     def crop(self, roi: BaseROI) -> "Sample":
         """Crop the sample with a hyperspy ROI and return a new cropped sample"""
+        out = self.__class__(self.xmap, self.axes)
         if isinstance(roi, RectangularROI):
             top = int(roi.top)
             bottom = int(roi.bottom)
             left = int(roi.left)
             right = int(roi.right)
-            new_xmap = self.xmap[top:bottom, left:right]
+            out._slices = (slice(top, bottom, None), slice(left, right, None))
         elif isinstance(roi, CircleROI):
             cx = int(roi.cx)
             cy = int(roi.cy)
@@ -89,10 +92,10 @@ class Sample(SampleHolder):
             x -= cx
             y -= cy
             mask = (x**2 + y**2) < r**2
-            new_xmap = self.xmap[mask.flatten()]
+            out._slices = mask
         else:
             raise NotImplementedError("Supported ROIs are RectangularROI and CircleROI")
-        return Sample(new_xmap, self.axes)
+        return out
 
     def plot_interactive(self) -> tuple[plt.Figure, Slider]:
         """Make a IPF plot with a slider for the tilt angle of each tilt axis
