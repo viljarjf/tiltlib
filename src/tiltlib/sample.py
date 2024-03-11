@@ -216,3 +216,9 @@ class Sample(SampleHolder):
 
     def to_signal(self) -> Signal1D:
         return Signal1D(self.orientations.data)
+    
+    def mean_zone_axis(self) -> Miller:
+        """Calculate the mean orientation in the sample, and return the zone axis. 
+        This is mostly useful for single-grain or cropped samples."""
+        optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
+        return (self.orientations.mean() * optical_axis).in_fundamental_sector().round()
