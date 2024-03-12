@@ -278,4 +278,4 @@ class Sample(SampleHolder):
     def mean_zone_axis(self) -> Miller:
         """Calculate the mean orientation in the sample, and return the zone axis. 
         This is mostly useful for single-grain or cropped samples."""
-        return (self.orientations.mean() * self.optical_axis).in_fundamental_sector().round()
+        return (self.orientations.mean() * self.optical_axis).round()
