@@ -252,7 +252,7 @@ class Sample(SampleHolder):
         else:
             raise NotImplementedError("Only 1 and 2 tilt axes are supported for this plot")
         self.reset_rotation()
-        return
+        return fig
 
     def to_navigator(self) -> Signal1D:
         """Get a IPF"""
