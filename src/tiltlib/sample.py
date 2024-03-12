@@ -141,7 +141,7 @@ class Sample(SampleHolder):
 
         sliders: list[Slider] = []
 
-        def update(_: float):
+        def update(_):
             self.rotate_to(*[slider.val for slider in sliders], degrees=True)
             x_im.set_data(ipfkey_x.orientation2color(self.orientations))
             y_im.set_data(ipfkey_y.orientation2color(self.orientations))
@@ -153,7 +153,7 @@ class Sample(SampleHolder):
 
             tilt_slider = Slider(
                 slider_ax,
-                "Tilt angle [deg]",
+                f"Tilt axis {i + 1} angle [deg]",
                 valmin=np.rad2deg(tilt_axis.min),
                 valmax=np.rad2deg(tilt_axis.max),
                 valinit=np.rad2deg(tilt_axis.angle),
@@ -167,7 +167,7 @@ class Sample(SampleHolder):
 
         return fig, tuple(sliders)
 
-    def find_tilt_angles(self, zone_axis: Miller) -> tuple[float, ...]:
+    def find_tilt_angles(self, zone_axis: Miller, degrees: bool = True) -> tuple[float, ...]:
         """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
 
         Args:
@@ -182,11 +182,11 @@ class Sample(SampleHolder):
 
         def angle_with(angles) -> np.ndarray:
             """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample. Flattened output."""
-            self.rotate_to(*angles, degrees=True)
+            self.rotate_to(*angles, degrees=degrees)
             return (
                 (self.orientations * optical_axis)
                 .in_fundamental_sector()
-                .angle_with(zone_axis, degrees=True)
+                .angle_with(zone_axis, degrees=degrees)
             )
 
         def optimize(angles) -> float:
@@ -195,10 +195,16 @@ class Sample(SampleHolder):
             k = aw.size // 3 * 2
             return np.mean(np.partition(aw, k, axis=None)[:k])
 
+        bounds = [(ax.min, ax.max) for ax in self.axes]
+        angles = self.angles
+        if degrees:
+            bounds = np.rad2deg(bounds)
+            angles = np.rad2deg(angles)
+        
         res = minimize(
             optimize,
-            self.angles,
-            bounds=np.rad2deg([(ax.min, ax.max) for ax in self.axes]),
+            angles,
+            bounds=bounds,
             method="Nelder-Mead",
         )
 
