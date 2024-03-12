@@ -187,11 +187,9 @@ class Sample(SampleHolder):
 
         """
         def optimize(angles) -> float:
-            """Mean of the bottom 2/3 of angles"""
             self.rotate_to(*angles, degrees=True)
             aw = self.angle_with(zone_axis, degrees=degrees)
-            k = aw.size // 3 * 2
-            return np.mean(np.partition(aw, k, axis=None)[:k])
+            return np.mean(aw)
 
         bounds = [(ax.min, ax.max) for ax in self.axes]
         angles = self.angles
@@ -209,6 +207,52 @@ class Sample(SampleHolder):
         self.reset_rotation()
 
         return res.x
+    
+    
+    def plot_angle_with(self, zone_axis: Miller, resolution: float = 1.0) -> plt.Figure:
+        """
+        Make a plot of similarity score as function of tilt angle(s).
+
+        Args:
+            zone_axis (Miller): desired zone axis
+            resolution (float): Degrees between each sampling point. Defaults to 1
+
+        Returns:
+            plt.Figure
+        """
+
+        def score(*angles) -> float:
+            self.rotate_to(angles, degrees=True)
+            aw = self.angle_with(zone_axis)
+            return np.mean(aw)
+        
+        if len(self.axes) == 1:
+            angles = np.arange(np.rad2deg(self.axes[0].min), np.rad2deg(self.axes[0].max), resolution)
+            scores = [score(angle) for angle in angles]
+
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.plot(angles, scores)
+            ax.set_xlabel("Tilt angle [deg]")
+            ax.set_ylabel(f"Mean angle with [{zone_axis.u} {zone_axis.v} {zone_axis.w}]")
+
+        elif len(self.axes) == 2:
+            angles_1 = np.arange(np.rad2deg(self.axes[0].min), np.rad2deg(self.axes[0].max), resolution)
+            angles_2 = np.arange(np.rad2deg(self.axes[1].min), np.rad2deg(self.axes[1].max), resolution)
+            scores = [score(angle_1, angle_2) for angle_2 in angles_2 for angle_1 in angles_1 ]
+            scores = np.array(scores).reshape((angles_2.size, angles_1.size))
+
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            im = ax.imshow(scores)
+            ax.set_xlabel("1st tilt angle [deg]")
+            ax.set_ylabel("2nd tilt angle")
+            fig.colorbar(im)
+
+        else:
+            raise NotImplementedError("Only 1 and 2 tilt axes are supported for this plot")
+        self.reset_rotation()
+        return
 
     def to_navigator(self) -> Signal1D:
         """Get a IPF"""
