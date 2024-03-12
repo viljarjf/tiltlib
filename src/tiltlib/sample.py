@@ -169,7 +169,7 @@ class Sample(SampleHolder):
         return fig, tuple(sliders)
 
     def angle_with(self, zone_axis: Miller, degrees: bool = True) -> np.ndarray:
-            """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample. Flattened output."""
+            """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample."""
             return (
                 (self.orientations * self.optical_axis)
                 .in_fundamental_sector()
