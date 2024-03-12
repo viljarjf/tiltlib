@@ -20,6 +20,7 @@ class Sample(SampleHolder):
         self.xmap = xmap.deepcopy()
         self._original_rotations = Rotation(xmap._rotations.data.copy())
         self._slices = (slice(None, None, None), slice(None, None, None))
+        self.optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
 
     @classmethod
     def from_sampleholder(
@@ -167,6 +168,14 @@ class Sample(SampleHolder):
 
         return fig, tuple(sliders)
 
+    def angle_with(self, zone_axis: Miller, degrees: bool = True) -> np.ndarray:
+            """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample."""
+            return (
+                (self.orientations * self.optical_axis)
+                .in_fundamental_sector()
+                .angle_with(zone_axis, degrees=degrees)
+            )
+    
     def find_tilt_angles(self, zone_axis: Miller, degrees: bool = True) -> tuple[float, ...]:
         """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
 
@@ -177,23 +186,10 @@ class Sample(SampleHolder):
             tuple[float, ...]: Tilt angles for each axis
 
         """
-
-        optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
-
-        def angle_with(angles) -> np.ndarray:
-            """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample. Flattened output."""
-            self.rotate_to(*angles, degrees=degrees)
-            return (
-                (self.orientations * optical_axis)
-                .in_fundamental_sector()
-                .angle_with(zone_axis, degrees=degrees)
-            )
-
         def optimize(angles) -> float:
-            """Mean of the bottom 2/3 of angles"""
-            aw = angle_with(angles)
-            k = aw.size // 3 * 2
-            return np.mean(np.partition(aw, k, axis=None)[:k])
+            self.rotate_to(*angles, degrees=True)
+            aw = self.angle_with(zone_axis, degrees=degrees)
+            return np.mean(aw)
 
         bounds = [(ax.min, ax.max) for ax in self.axes]
         angles = self.angles
@@ -211,6 +207,52 @@ class Sample(SampleHolder):
         self.reset_rotation()
 
         return res.x
+    
+    
+    def plot_angle_with(self, zone_axis: Miller, resolution: float = 1.0) -> plt.Figure:
+        """
+        Make a plot of similarity score as function of tilt angle(s).
+
+        Args:
+            zone_axis (Miller): desired zone axis
+            resolution (float): Degrees between each sampling point. Defaults to 1
+
+        Returns:
+            plt.Figure
+        """
+
+        def score(*angles) -> float:
+            self.rotate_to(angles, degrees=True)
+            aw = self.angle_with(zone_axis)
+            return np.mean(aw)
+        
+        if len(self.axes) == 1:
+            angles = np.arange(np.rad2deg(self.axes[0].min), np.rad2deg(self.axes[0].max), resolution)
+            scores = [score(angle) for angle in angles]
+
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.plot(angles, scores)
+            ax.set_xlabel("Tilt angle [deg]")
+            ax.set_ylabel(f"Mean angle with [{zone_axis.u} {zone_axis.v} {zone_axis.w}]")
+
+        elif len(self.axes) == 2:
+            angles_1 = np.arange(np.rad2deg(self.axes[0].min), np.rad2deg(self.axes[0].max), resolution)
+            angles_2 = np.arange(np.rad2deg(self.axes[1].min), np.rad2deg(self.axes[1].max), resolution)
+            scores = [score(angle_1, angle_2) for angle_2 in angles_2 for angle_1 in angles_1 ]
+            scores = np.array(scores).reshape((angles_2.size, angles_1.size))
+
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            im = ax.imshow(scores)
+            ax.set_xlabel("1st tilt angle [deg]")
+            ax.set_ylabel("2nd tilt angle")
+            fig.colorbar(im)
+
+        else:
+            raise NotImplementedError("Only 1 and 2 tilt axes are supported for this plot")
+        self.reset_rotation()
+        return fig
 
     def to_navigator(self) -> Signal1D:
         """Get a IPF"""
@@ -236,5 +278,4 @@ class Sample(SampleHolder):
     def mean_zone_axis(self) -> Miller:
         """Calculate the mean orientation in the sample, and return the zone axis. 
         This is mostly useful for single-grain or cropped samples."""
-        optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
-        return (self.orientations.mean() * optical_axis).in_fundamental_sector().round()
+        return (self.orientations.mean() * self.optical_axis).round()
