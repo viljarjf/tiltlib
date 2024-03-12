@@ -20,6 +20,7 @@ class Sample(SampleHolder):
         self.xmap = xmap.deepcopy()
         self._original_rotations = Rotation(xmap._rotations.data.copy())
         self._slices = (slice(None, None, None), slice(None, None, None))
+        self.optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
 
     @classmethod
     def from_sampleholder(
@@ -167,6 +168,14 @@ class Sample(SampleHolder):
 
         return fig, tuple(sliders)
 
+    def angle_with(self, zone_axis: Miller, degrees: bool = True) -> np.ndarray:
+            """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample. Flattened output."""
+            return (
+                (self.orientations * self.optical_axis)
+                .in_fundamental_sector()
+                .angle_with(zone_axis, degrees=degrees)
+            )
+    
     def find_tilt_angles(self, zone_axis: Miller, degrees: bool = True) -> tuple[float, ...]:
         """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
 
@@ -177,21 +186,10 @@ class Sample(SampleHolder):
             tuple[float, ...]: Tilt angles for each axis
 
         """
-
-        optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
-
-        def angle_with(angles) -> np.ndarray:
-            """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample. Flattened output."""
-            self.rotate_to(*angles, degrees=degrees)
-            return (
-                (self.orientations * optical_axis)
-                .in_fundamental_sector()
-                .angle_with(zone_axis, degrees=degrees)
-            )
-
         def optimize(angles) -> float:
             """Mean of the bottom 2/3 of angles"""
-            aw = angle_with(angles)
+            self.rotate_to(*angles, degrees=True)
+            aw = self.angle_with(zone_axis, degrees=degrees)
             k = aw.size // 3 * 2
             return np.mean(np.partition(aw, k, axis=None)[:k])
 
@@ -236,5 +234,4 @@ class Sample(SampleHolder):
     def mean_zone_axis(self) -> Miller:
         """Calculate the mean orientation in the sample, and return the zone axis. 
         This is mostly useful for single-grain or cropped samples."""
-        optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
-        return (self.orientations.mean() * optical_axis).in_fundamental_sector().round()
+        return (self.orientations.mean() * self.optical_axis).in_fundamental_sector().round()
