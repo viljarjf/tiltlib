@@ -28,7 +28,10 @@ class Sample(SampleHolder):
         return cls(xmap, sampleholder.axes)
 
     def _update_xmap(self):
-        self.xmap._rotations[:, 0] = self._original_rotations[:, 0] * ~self._rotation
+        if len(self.xmap._rotations.shape) == 1:
+            self.xmap._rotations[:] = self._original_rotations[:] * ~self._rotation
+        else:
+            self.xmap._rotations[:, 0] = self._original_rotations[:, 0] * ~self._rotation
 
     def rotate_to(self, *angles: float, degrees: bool = False):
         SampleHolder.rotate_to(self, *angles, degrees=degrees)
@@ -75,7 +78,14 @@ class Sample(SampleHolder):
 
     def crop(self, roi: BaseROI) -> "Sample":
         """Crop the sample with a hyperspy ROI and return a new cropped sample"""
+
+        # Ensure no default rotation in the 
+        angles = self.angles
+        self.reset_rotation()
         out = self.__class__(self.xmap, self.axes)
+        self.rotate_to(*angles)
+        out.rotate_to(*angles)
+
         if isinstance(roi, RectangularROI):
             top = int(roi.top)
             bottom = int(roi.bottom)
