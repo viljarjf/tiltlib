@@ -4,6 +4,7 @@ from typing import Callable
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.gridspec import GridSpec
 from matplotlib.widgets import Slider
 from orix.crystal_map import CrystalMap, Phase
 from orix.plot import IPFColorKeyTSL
@@ -105,9 +106,11 @@ class Sample(SampleHolder):
             The sliders are returned with the figure to avoid their functionality being deleted when the function returns
         """
 
-        fig, ax = plt.subplots(1, 3, sharex="all", sharey="all")
-        ax: tuple[plt.Axes, ...]
-        (x_ax, y_ax, z_ax) = ax
+        fig = plt.figure(layout="constrained")
+        spec = GridSpec(3, 6, fig, height_ratios=[7, 1, 1])
+        x_ax = fig.add_subplot(spec[0, 0:2])
+        y_ax = fig.add_subplot(spec[0, 2:4])
+        z_ax = fig.add_subplot(spec[0, 4:6])
 
         oris = self.orientations
         symmetry = oris.symmetry
@@ -137,7 +140,7 @@ class Sample(SampleHolder):
             fig.canvas.draw_idle()
 
         for i, tilt_axis in enumerate(self.axes):
-            slider_ax = fig.add_axes([0.3, 0.05 + 0.1 * i, 0.4, 0.05])
+            slider_ax = fig.add_subplot(spec[1 + i, 1:5])
 
             tilt_slider = Slider(
                 slider_ax,
@@ -150,8 +153,6 @@ class Sample(SampleHolder):
             )
             tilt_slider.on_changed(update)
             sliders.append(tilt_slider)
-
-        fig.tight_layout()
 
         return fig, tuple(sliders)
 
