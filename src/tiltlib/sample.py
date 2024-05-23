@@ -158,7 +158,7 @@ class Sample(SampleHolder):
             sliders.append(tilt_slider)
 
         return fig, tuple(sliders)
-    
+
     def plot_orientations_interactive(self) -> tuple[plt.Figure, Slider]:
         fig = plt.figure(layout="constrained")
         spec = GridSpec(3, 6, fig, height_ratios=[7, 1, 1])
@@ -177,18 +177,16 @@ class Sample(SampleHolder):
         x_ax.set_title("x")
         y_ax.set_title("y")
         z_ax.set_title("z")
-        
+
         proj = StereographicProjection()
-               
+
         sector = self.phase.point_group.fundamental_sector
         edges = _closed_edges_in_hemisphere(sector.edges, sector)
         x_ax.plot(*proj.vector2xy(edges), c="black")
         y_ax.plot(*proj.vector2xy(edges), c="black")
         z_ax.plot(*proj.vector2xy(edges), c="black")
 
-        labels = _get_ipf_axes_labels(
-            sector.vertices, symmetry=self.phase.point_group
-        )
+        labels = _get_ipf_axes_labels(sector.vertices, symmetry=self.phase.point_group)
         for l, x, y in zip(labels, *proj.vector2xy(sector.vertices)):
             x_ax.text(x, y, l, ha="center")
             y_ax.text(x, y, l, ha="center")
