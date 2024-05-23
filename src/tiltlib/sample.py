@@ -3,46 +3,42 @@ from __future__ import annotations
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider
-from orix.crystal_map import CrystalMap
+from orix.crystal_map import CrystalMap, Phase
 from orix.plot import IPFColorKeyTSL
 from orix.quaternion import Orientation, Rotation
 from orix.vector import Vector3d, Miller
 from scipy.optimize import minimize
 from hyperspy.signals import Signal1D
 from hyperspy.roi import BaseROI, CircleROI, RectangularROI
+from numba import njit
 
 from tiltlib.sample_holder import Axis, SampleHolder
 
-
 class Sample(SampleHolder):
-    def __init__(self, xmap: CrystalMap, axes: list[Axis] = None) -> None:
+    
+    def __init__(self, oris: Orientation, phase: Phase, axes: list[Axis] = None) -> None:
         SampleHolder.__init__(self, axes)
-        self.xmap = xmap.deepcopy()
-        self._original_rotations = Rotation(xmap._rotations.data.copy())
-        self._slices = (slice(None, None, None), slice(None, None, None))
-        self.optical_axis = Miller(uvw=[0, 0, 1], phase=self.xmap.phases[0])
+        self.phase = phase
+        self._original_rotations = Rotation(oris.data.copy())
+        self.optical_axis_miller = Miller(hkl=[0, 0, 1], phase=self.phase)
+        self.optical_axis = self.optical_axis_miller.unit
 
+    @classmethod
+    def from_crystal_map(cls, xmap: CrystalMap, axes: list[Axis] = None) -> None:
+        oris = xmap.orientations.reshape(*xmap.shape)
+        return cls(oris, xmap.phases[0], axes)
+    
     @classmethod
     def from_sampleholder(
         cls, xmap: CrystalMap, sampleholder: SampleHolder
     ) -> "Sample":
         return cls(xmap, sampleholder.axes)
 
-    def _update_xmap(self):
-        if len(self.xmap._rotations.shape) == 1:
-            self.xmap._rotations[:] = self._original_rotations[:] * ~self._rotation
-        else:
-            self.xmap._rotations[:, 0] = self._original_rotations[:, 0] * ~self._rotation
-
-    def rotate_to(self, *angles: float, degrees: bool = False):
-        SampleHolder.rotate_to(self, *angles, degrees=degrees)
-        self._update_xmap()
-
-    # TODO fix coordinates changing in the xmap maybe
-
     @property
     def orientations(self) -> Orientation:
-        o = self.xmap.orientations.reshape(*self.xmap.shape)[self._slices]
+        r = self._original_rotations
+        r *= ~self._rotation
+        o = Orientation(r.data, symmetry=self.phase.point_group)
         return o
 
     def plot(self) -> plt.Figure:
@@ -79,34 +75,28 @@ class Sample(SampleHolder):
 
     def crop(self, roi: BaseROI) -> "Sample":
         """Crop the sample with a hyperspy ROI and return a new cropped sample"""
-
-        # Ensure no default rotation in the 
-        angles = self.angles
-        self.reset_rotation()
-        out = self.__class__(self.xmap, self.axes)
-        self.rotate_to(*angles)
-        out.rotate_to(*angles)
-
         if isinstance(roi, RectangularROI):
             top = int(roi.top)
             bottom = int(roi.bottom)
             left = int(roi.left)
             right = int(roi.right)
-            out._slices = (slice(top, bottom, None), slice(left, right, None))
+            slices = (slice(top, bottom, None), slice(left, right, None))
         elif isinstance(roi, CircleROI):
             cx = int(roi.cx)
             cy = int(roi.cy)
             r = roi.r
-            x = np.arange(self.xmap.shape[1], dtype=float)
-            y = np.arange(self.xmap.shape[0], dtype=float)
+            x = np.arange(self._original_rotations.shape[1], dtype=float)
+            y = np.arange(self._original_rotations.shape[0], dtype=float)
             x, y = np.meshgrid(x, y)
             x -= cx
             y -= cy
             mask = (x**2 + y**2) < r**2
-            out._slices = mask
+            slices = mask
         else:
             raise NotImplementedError("Supported ROIs are RectangularROI and CircleROI")
-        return out
+        oris = self._original_rotations[slices]
+        axes = self.axes
+        return self.__class__(oris, self.phase, axes)
 
     def plot_interactive(self) -> tuple[plt.Figure, Slider]:
         """Make a IPF plot with a slider for the tilt angle of each tilt axis
@@ -170,11 +160,11 @@ class Sample(SampleHolder):
 
     def angle_with(self, zone_axis: Miller, degrees: bool = True) -> np.ndarray:
             """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample."""
-            return (
-                (self.orientations * self.optical_axis)
-                .in_fundamental_sector()
-                .angle_with(zone_axis, degrees=degrees)
-            )
+            vecs = (self.orientations * self.optical_axis).in_fundamental_sector()
+            angles = _jit_angle_with(vecs.data, zone_axis.data)
+            if degrees:
+                angles = np.rad2deg(angles)
+            return angles
     
     def find_tilt_angles(self, zone_axis: Miller, degrees: bool = True) -> tuple[float, ...]:
         """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
@@ -278,4 +268,12 @@ class Sample(SampleHolder):
     def mean_zone_axis(self) -> Miller:
         """Calculate the mean orientation in the sample, and return the zone axis. 
         This is mostly useful for single-grain or cropped samples."""
-        return (self.orientations.mean() * self.optical_axis).round()
+        return (self.orientations.mean() * self.optical_axis_miller).round()
+
+@njit
+def _jit_angle_with(vecs, target):
+    dot = np.sum(vecs * target, axis=-1)
+    norm = np.sqrt(np.sum(np.square(target)))
+    cosines = dot / norm
+    angles = np.arccos(cosines)
+    return angles
