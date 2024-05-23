@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Callable
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider
@@ -14,25 +16,20 @@ from numba import njit
 
 from tiltlib.sample_holder import Axis, SampleHolder
 
+
 class Sample(SampleHolder):
-    
+
     def __init__(self, oris: Orientation, phase: Phase, axes: list[Axis]) -> None:
         SampleHolder.__init__(self, axes)
         self.phase = phase
         self._original_rotations = Rotation(oris.data.copy())
-        self.optical_axis_miller = Miller(hkl=[0, 0, 1], phase=self.phase)
+        self.optical_axis_miller = Miller(uvw=[0, 0, 1], phase=self.phase)
         self.optical_axis = self.optical_axis_miller.unit
 
     @classmethod
     def from_crystal_map(cls, xmap: CrystalMap, axes: list[Axis] = None) -> "Sample":
         oris = xmap.orientations.reshape(*xmap.shape)
         return cls(oris, xmap.phases[0], axes)
-    
-    @classmethod
-    def from_sampleholder(
-        cls, xmap: CrystalMap, sampleholder: SampleHolder
-    ) -> "Sample":
-        return cls(xmap, sampleholder.axes)
 
     @property
     def orientations(self) -> Orientation:
@@ -159,14 +156,19 @@ class Sample(SampleHolder):
         return fig, tuple(sliders)
 
     def angle_with(self, zone_axis: Miller, degrees: bool = True) -> np.ndarray:
-            """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample."""
-            vecs = (self.orientations * self.optical_axis).in_fundamental_sector()
-            angles = _jit_angle_with(vecs.data, zone_axis.data)
-            if degrees:
-                angles = np.rad2deg(angles)
-            return angles
-    
-    def find_tilt_angles(self, zone_axis: Miller, degrees: bool = True) -> tuple[float, ...]:
+        """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample."""
+        vecs = (self.orientations * self.optical_axis).in_fundamental_sector()
+        angles = _jit_angle_with(vecs.data, zone_axis.data)
+        if degrees:
+            angles = np.rad2deg(angles)
+        return angles
+
+    def find_tilt_angles(
+        self,
+        zone_axis: Miller,
+        degrees: bool = True,
+        use_mean_orientation: bool = False,
+    ) -> tuple[float, ...]:
         """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
 
         Args:
@@ -176,17 +178,18 @@ class Sample(SampleHolder):
             tuple[float, ...]: Tilt angles for each axis
 
         """
-        def optimize(angles) -> float:
-            self.rotate_to(*angles, degrees=True)
-            aw = self.angle_with(zone_axis, degrees=degrees)
-            return np.mean(aw)
+
+        if use_mean_orientation:
+            optimize = self._optimize_mean_orientation_func(zone_axis, degrees)
+        else:
+            optimize = self._optimize_angle_with_func(zone_axis, degrees)
 
         bounds = [(ax.min, ax.max) for ax in self.axes]
         angles = self.angles
         if degrees:
             bounds = np.rad2deg(bounds)
             angles = np.rad2deg(angles)
-        
+
         res = minimize(
             optimize,
             angles,
@@ -197,9 +200,13 @@ class Sample(SampleHolder):
         self.reset_rotation()
 
         return res.x
-    
-    
-    def plot_angle_with(self, zone_axis: Miller, resolution: float = 1.0) -> plt.Figure:
+
+    def plot_angle_with(
+        self,
+        zone_axis: Miller,
+        resolution: float = 1.0,
+        use_mean_orientation: bool = False,
+    ) -> plt.Figure:
         """
         Make a plot of similarity score as function of tilt angle(s).
 
@@ -211,36 +218,58 @@ class Sample(SampleHolder):
             plt.Figure
         """
 
-        def score(*angles) -> float:
-            self.rotate_to(angles, degrees=True)
-            aw = self.angle_with(zone_axis)
-            return np.mean(aw)
-        
+        if use_mean_orientation:
+            score = self._optimize_mean_orientation_func(zone_axis, degrees=True)
+        else:
+            score = self._optimize_angle_with_func(zone_axis, degrees=True)
+
         if len(self.axes) == 1:
-            angles = np.arange(np.rad2deg(self.axes[0].min), np.rad2deg(self.axes[0].max), resolution)
+            angles = np.arange(
+                np.rad2deg(self.axes[0].min), np.rad2deg(self.axes[0].max), resolution
+            )
             scores = [score(angle) for angle in angles]
 
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
             ax.plot(angles, scores)
             ax.set_xlabel("Tilt angle [deg]")
-            ax.set_ylabel(f"Mean angle with [{zone_axis.u} {zone_axis.v} {zone_axis.w}]")
+            ax.set_ylabel(
+                f"Mean angle with [{zone_axis.u} {zone_axis.v} {zone_axis.w}]"
+            )
 
         elif len(self.axes) == 2:
-            angles_1 = np.arange(np.rad2deg(self.axes[0].min), np.rad2deg(self.axes[0].max), resolution)
-            angles_2 = np.arange(np.rad2deg(self.axes[1].min), np.rad2deg(self.axes[1].max), resolution)
-            scores = [score(angle_1, angle_2) for angle_2 in angles_2 for angle_1 in angles_1 ]
+            angles_1 = np.arange(
+                np.rad2deg(self.axes[0].min), np.rad2deg(self.axes[0].max), resolution
+            )
+            angles_2 = np.arange(
+                np.rad2deg(self.axes[1].min), np.rad2deg(self.axes[1].max), resolution
+            )
+            scores = [
+                score((angle_1, angle_2))
+                for angle_2 in angles_2
+                for angle_1 in angles_1
+            ]
             scores = np.array(scores).reshape((angles_2.size, angles_1.size))
 
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
-            im = ax.imshow(scores)
+            im = ax.imshow(
+                scores,
+                extent=[
+                    angles_1[0],
+                    angles_1[-1],
+                    angles_2[0],
+                    angles_2[-1],
+                ],
+            )
             ax.set_xlabel("1st tilt angle [deg]")
             ax.set_ylabel("2nd tilt angle")
             fig.colorbar(im)
 
         else:
-            raise NotImplementedError("Only 1 and 2 tilt axes are supported for this plot")
+            raise NotImplementedError(
+                "Only 1 and 2 tilt axes are supported for this plot"
+            )
         self.reset_rotation()
         return fig
 
@@ -264,11 +293,35 @@ class Sample(SampleHolder):
 
     def to_signal(self) -> Signal1D:
         return Signal1D(self.orientations.data)
-    
+
     def mean_zone_axis(self) -> Miller:
-        """Calculate the mean orientation in the sample, and return the zone axis. 
+        """Calculate the mean orientation in the sample, and return the zone axis.
         This is mostly useful for single-grain or cropped samples."""
         return (self.orientations.mean() * self.optical_axis_miller).round()
+
+    def _optimize_angle_with_func(
+        self, zone_axis: Miller, degrees: bool
+    ) -> Callable[[tuple[float, ...]], float]:
+        def optimize(angles) -> float:
+            self.rotate_to(angles, degrees=degrees)
+            aw = self.angle_with(zone_axis)
+            return np.mean(aw)
+
+        return optimize
+
+    def _optimize_mean_orientation_func(
+        self, zone_axis: Miller, degrees: bool
+    ) -> Callable[[tuple[float, ...]], float]:
+        o = self._original_rotations.mean()
+
+        def optimize(angles) -> float:
+            self.rotate_to(angles, degrees=degrees)
+            ro = o * ~self._rotation
+            mean_zone = (ro * self.optical_axis_miller).in_fundamental_sector()
+            return mean_zone.angle_with(zone_axis, degrees=degrees)
+
+        return optimize
+
 
 @njit
 def _jit_angle_with(vecs, target):
