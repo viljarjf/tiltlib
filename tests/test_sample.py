@@ -10,7 +10,7 @@ from tiltlib import Axis, Sample
 )
 def test_reset_rotation(initial_angle: float, x, default_xmap):
     original_xmap = default_xmap
-    s = Sample(default_xmap, [Axis(x, -100, 100, initial_angle, degrees=True)])
+    s = Sample.from_crystal_map(default_xmap, [Axis(x, -100, 100, initial_angle, degrees=True)])
 
     assert s.orientations == original_xmap.orientations.reshape(*original_xmap.shape)
 
@@ -33,8 +33,8 @@ def test_reset_rotation(initial_angle: float, x, default_xmap):
     ],
 )
 def test_initial_angle(angle_1: float, angle_2: float, default_xmap, x):
-    s1 = Sample(default_xmap, [Axis(x, -100, 100, angle_1, degrees=True)])
-    s2 = Sample(default_xmap, [Axis(x, -100, 100, angle_2, degrees=True)])
+    s1 = Sample.from_crystal_map(default_xmap, [Axis(x, -100, 100, angle_1, degrees=True)])
+    s2 = Sample.from_crystal_map(default_xmap, [Axis(x, -100, 100, angle_2, degrees=True)])
 
     assert s1.orientations == s2.orientations
 
@@ -59,8 +59,8 @@ def test_initial_angle(angle_1: float, angle_2: float, default_xmap, x):
 
 
 def test_rotate_to(default_xmap, x):
-    s1 = Sample(default_xmap, [Axis(x, -100, 100, degrees=True)])
-    s2 = Sample(default_xmap, [Axis(x, -100, 100, degrees=True)])
+    s1 = Sample.from_crystal_map(default_xmap, [Axis(x, -100, 100, degrees=True)])
+    s2 = Sample.from_crystal_map(default_xmap, [Axis(x, -100, 100, degrees=True)])
 
     assert s1.orientations == s2.orientations
 
@@ -86,8 +86,8 @@ def test_rotate_to(default_xmap, x):
 
 
 def test_rotate_to_with_initial_angle(x, default_xmap):
-    s1 = Sample(default_xmap, [Axis(x, -100, 100, 10, degrees=True)])
-    s2 = Sample(default_xmap, [Axis(x, -100, 100, degrees=True)])
+    s1 = Sample.from_crystal_map(default_xmap, [Axis(x, -100, 100, 10, degrees=True)])
+    s2 = Sample.from_crystal_map(default_xmap, [Axis(x, -100, 100, degrees=True)])
 
     assert s1.orientations == s2.orientations
 
@@ -117,11 +117,11 @@ def test_rotate_to_with_initial_angle(x, default_xmap):
 
 
 def test_rotating_to_initial_angle(x, default_xmap):
-    s1 = Sample(default_xmap, [Axis(x, -100, 100, degrees=True)])
+    s1 = Sample.from_crystal_map(default_xmap, [Axis(x, -100, 100, degrees=True)])
 
     s1.rotate_to(5, degrees=True)
 
-    s2 = Sample(s1.xmap, [Axis(x, -100, 100, 5, degrees=True)])
+    s2 = Sample(s1.orientations, s1.phase, [Axis(x, -100, 100, 5, degrees=True)])
 
     assert s1.orientations == s2.orientations
 

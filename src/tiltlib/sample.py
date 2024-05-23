@@ -16,7 +16,7 @@ from tiltlib.sample_holder import Axis, SampleHolder
 
 class Sample(SampleHolder):
     
-    def __init__(self, oris: Orientation, phase: Phase, axes: list[Axis] = None) -> None:
+    def __init__(self, oris: Orientation, phase: Phase, axes: list[Axis]) -> None:
         SampleHolder.__init__(self, axes)
         self.phase = phase
         self._original_rotations = Rotation(oris.data.copy())
@@ -24,7 +24,7 @@ class Sample(SampleHolder):
         self.optical_axis = self.optical_axis_miller.unit
 
     @classmethod
-    def from_crystal_map(cls, xmap: CrystalMap, axes: list[Axis] = None) -> None:
+    def from_crystal_map(cls, xmap: CrystalMap, axes: list[Axis] = None) -> "Sample":
         oris = xmap.orientations.reshape(*xmap.shape)
         return cls(oris, xmap.phases[0], axes)
     
