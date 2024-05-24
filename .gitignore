@@ -4,3 +4,7 @@
 *.egg-info
 __pycache__
 dist
+
+docs/build
+docs/source/generated
+docs/source/reference/generated
