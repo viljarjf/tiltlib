@@ -106,7 +106,7 @@ class Sample(SampleHolder):
         return res.x
 
     def plot(self) -> plt.Figure:
-        """Plot IPFs of the orientations at the given tilt angle(s)
+        """Plot IPF colormap of the orientations at the given tilt angle(s)
 
         Returns:
             plt.Figure:
@@ -137,10 +137,21 @@ class Sample(SampleHolder):
         fig.tight_layout()
         return fig
 
+    def plot_orientations(self) -> plt.Figure:
+        """
+        IPF scatterplot of orientations
+        """
+        fig = self.orientations.scatter(
+            projection="ipf",
+            return_figure=True,
+            direction=Vector3d(np.eye(3)),
+        )
+        return fig
+
     def plot_interactive(
         self,
     ) -> tuple[plt.Figure, Slider]:
-        """Make a IPF plot with a slider for the tilt angle of each tilt axis
+        """Make a IPF colormap plot with a slider for the tilt angle of each tilt axis
 
         Returns:
             tuple[plt.Figure, tuple[Slider, ...]]: The figure, and a tuple of all the sliders
