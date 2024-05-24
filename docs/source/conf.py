@@ -8,12 +8,13 @@
 import sys
 sys.path.append("../../")
 
+from importlib.metadata import version as imversion
 
 project = 'tiltlib'
 copyright = '2024, Viljar Femoen'
 author = 'Viljar Femoen'
-version = "0.0.5"
-release = "0.0.5"
+version = imversion("tiltlib")
+release = imversion("tiltlib")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
