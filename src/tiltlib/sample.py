@@ -4,11 +4,15 @@ from typing import Callable
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.gridspec import GridSpec
 from matplotlib.widgets import Slider
 from orix.crystal_map import CrystalMap, Phase
 from orix.plot import IPFColorKeyTSL
+from orix.plot.inverse_pole_figure_plot import _get_ipf_axes_labels
 from orix.quaternion import Orientation, Rotation
 from orix.vector import Vector3d, Miller
+from orix.vector.fundamental_sector import _closed_edges_in_hemisphere
+from orix.projections import StereographicProjection
 from scipy.optimize import minimize
 from hyperspy.signals import Signal1D
 from hyperspy.roi import BaseROI, CircleROI, RectangularROI
@@ -105,9 +109,11 @@ class Sample(SampleHolder):
             The sliders are returned with the figure to avoid their functionality being deleted when the function returns
         """
 
-        fig, ax = plt.subplots(1, 3, sharex="all", sharey="all")
-        ax: tuple[plt.Axes, ...]
-        (x_ax, y_ax, z_ax) = ax
+        fig = plt.figure(layout="constrained")
+        spec = GridSpec(3, 6, fig, height_ratios=[7, 1, 1])
+        x_ax = fig.add_subplot(spec[0, 0:2])
+        y_ax = fig.add_subplot(spec[0, 2:4])
+        z_ax = fig.add_subplot(spec[0, 4:6])
 
         oris = self.orientations
         symmetry = oris.symmetry
@@ -137,7 +143,7 @@ class Sample(SampleHolder):
             fig.canvas.draw_idle()
 
         for i, tilt_axis in enumerate(self.axes):
-            slider_ax = fig.add_axes([0.3, 0.05 + 0.1 * i, 0.4, 0.05])
+            slider_ax = fig.add_subplot(spec[1 + i, 1:5])
 
             tilt_slider = Slider(
                 slider_ax,
@@ -151,8 +157,77 @@ class Sample(SampleHolder):
             tilt_slider.on_changed(update)
             sliders.append(tilt_slider)
 
-        fig.tight_layout()
+        return fig, tuple(sliders)
 
+    def plot_orientations_interactive(self) -> tuple[plt.Figure, Slider]:
+        fig = plt.figure(layout="constrained")
+        spec = GridSpec(3, 6, fig, height_ratios=[7, 1, 1])
+        x_ax = fig.add_subplot(spec[0, 0:2])
+        y_ax = fig.add_subplot(spec[0, 2:4])
+        z_ax = fig.add_subplot(spec[0, 4:6])
+
+        x_ax.axis("off")
+        y_ax.axis("off")
+        z_ax.axis("off")
+
+        x_ax.set_aspect("equal")
+        y_ax.set_aspect("equal")
+        z_ax.set_aspect("equal")
+
+        x_ax.set_title("x")
+        y_ax.set_title("y")
+        z_ax.set_title("z")
+
+        proj = StereographicProjection()
+
+        sector = self.phase.point_group.fundamental_sector
+        edges = _closed_edges_in_hemisphere(sector.edges, sector)
+        x_ax.plot(*proj.vector2xy(edges), c="black")
+        y_ax.plot(*proj.vector2xy(edges), c="black")
+        z_ax.plot(*proj.vector2xy(edges), c="black")
+
+        labels = _get_ipf_axes_labels(sector.vertices, symmetry=self.phase.point_group)
+        for l, x, y in zip(labels, *proj.vector2xy(sector.vertices)):
+            x_ax.text(x, y, l, ha="center")
+            y_ax.text(x, y, l, ha="center")
+            z_ax.text(x, y, l, ha="center")
+
+        oris = self.orientations.flatten()
+        x_oris = (oris * Vector3d.xvector()).in_fundamental_sector(oris.symmetry)
+        y_oris = (oris * Vector3d.yvector()).in_fundamental_sector(oris.symmetry)
+        z_oris = (oris * Vector3d.zvector()).in_fundamental_sector(oris.symmetry)
+
+        x_scatter = x_ax.scatter(*proj.vector2xy(x_oris))
+        y_scatter = y_ax.scatter(*proj.vector2xy(y_oris))
+        z_scatter = z_ax.scatter(*proj.vector2xy(z_oris))
+
+        sliders: list[Slider] = []
+
+        def update(_):
+            self.rotate_to(*[slider.val for slider in sliders], degrees=True)
+            oris = self.orientations.flatten()
+            x_oris = (oris * Vector3d.xvector()).in_fundamental_sector(oris.symmetry)
+            y_oris = (oris * Vector3d.yvector()).in_fundamental_sector(oris.symmetry)
+            z_oris = (oris * Vector3d.zvector()).in_fundamental_sector(oris.symmetry)
+            x_scatter.set_offsets(np.array(proj.vector2xy(x_oris)).T)
+            y_scatter.set_offsets(np.array(proj.vector2xy(y_oris)).T)
+            z_scatter.set_offsets(np.array(proj.vector2xy(z_oris)).T)
+            fig.canvas.draw_idle()
+
+        for i, tilt_axis in enumerate(self.axes):
+            slider_ax = fig.add_subplot(spec[1 + i, 1:5])
+
+            tilt_slider = Slider(
+                slider_ax,
+                f"Tilt axis {i + 1} angle [deg]",
+                valmin=np.rad2deg(tilt_axis.min),
+                valmax=np.rad2deg(tilt_axis.max),
+                valinit=np.rad2deg(tilt_axis.angle),
+                valfmt="%.2f",
+                facecolor="#cc7000",
+            )
+            tilt_slider.on_changed(update)
+            sliders.append(tilt_slider)
         return fig, tuple(sliders)
 
     def angle_with(self, zone_axis: Miller, degrees: bool = True) -> np.ndarray:
