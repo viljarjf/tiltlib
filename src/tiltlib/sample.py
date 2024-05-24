@@ -42,6 +42,69 @@ class Sample(SampleHolder):
         o = Orientation(r.data, symmetry=self.phase.point_group)
         return o
 
+    def crop(self, roi: BaseROI) -> "Sample":
+        """Crop the sample with a hyperspy ROI and return a new cropped sample"""
+        if isinstance(roi, RectangularROI):
+            top = int(roi.top)
+            bottom = int(roi.bottom)
+            left = int(roi.left)
+            right = int(roi.right)
+            slices = (slice(top, bottom, None), slice(left, right, None))
+        elif isinstance(roi, CircleROI):
+            cx = int(roi.cx)
+            cy = int(roi.cy)
+            r = roi.r
+            x = np.arange(self._original_rotations.shape[1], dtype=float)
+            y = np.arange(self._original_rotations.shape[0], dtype=float)
+            x, y = np.meshgrid(x, y)
+            x -= cx
+            y -= cy
+            mask = (x**2 + y**2) < r**2
+            slices = mask
+        else:
+            raise NotImplementedError("Supported ROIs are RectangularROI and CircleROI")
+        oris = self._original_rotations[slices]
+        axes = self.axes
+        return self.__class__(oris, self.phase, axes)
+
+    def find_tilt_angles(
+        self,
+        zone_axis: Miller,
+        degrees: bool = True,
+        use_mean_orientation: bool = False,
+    ) -> tuple[float, ...]:
+        """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
+
+        Args:
+            zone_axis (Miller): desired zone axis
+
+        Returns:
+            tuple[float, ...]: Tilt angles for each axis
+
+        """
+
+        if use_mean_orientation:
+            optimize = self._optimize_mean_orientation_func(zone_axis, degrees)
+        else:
+            optimize = self._optimize_angle_with_func(zone_axis, degrees)
+
+        bounds = [(ax.min, ax.max) for ax in self.axes]
+        angles = self.angles
+        if degrees:
+            bounds = np.rad2deg(bounds)
+            angles = np.rad2deg(angles)
+
+        res = minimize(
+            optimize,
+            angles,
+            bounds=bounds,
+            method="Nelder-Mead",
+        )
+
+        self.reset_rotation()
+
+        return res.x
+
     def plot(self) -> plt.Figure:
         """Plot IPFs of the orientations at the given tilt angle(s)
 
@@ -74,32 +137,9 @@ class Sample(SampleHolder):
         fig.tight_layout()
         return fig
 
-    def crop(self, roi: BaseROI) -> "Sample":
-        """Crop the sample with a hyperspy ROI and return a new cropped sample"""
-        if isinstance(roi, RectangularROI):
-            top = int(roi.top)
-            bottom = int(roi.bottom)
-            left = int(roi.left)
-            right = int(roi.right)
-            slices = (slice(top, bottom, None), slice(left, right, None))
-        elif isinstance(roi, CircleROI):
-            cx = int(roi.cx)
-            cy = int(roi.cy)
-            r = roi.r
-            x = np.arange(self._original_rotations.shape[1], dtype=float)
-            y = np.arange(self._original_rotations.shape[0], dtype=float)
-            x, y = np.meshgrid(x, y)
-            x -= cx
-            y -= cy
-            mask = (x**2 + y**2) < r**2
-            slices = mask
-        else:
-            raise NotImplementedError("Supported ROIs are RectangularROI and CircleROI")
-        oris = self._original_rotations[slices]
-        axes = self.axes
-        return self.__class__(oris, self.phase, axes)
-
-    def plot_interactive(self) -> tuple[plt.Figure, Slider]:
+    def plot_interactive(
+        self,
+    ) -> tuple[plt.Figure, Slider]:
         """Make a IPF plot with a slider for the tilt angle of each tilt axis
 
         Returns:
@@ -230,52 +270,6 @@ class Sample(SampleHolder):
             sliders.append(tilt_slider)
         return fig, tuple(sliders)
 
-    def angle_with(self, zone_axis: Miller, degrees: bool = True) -> np.ndarray:
-        """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample."""
-        vecs = (self.orientations * self.optical_axis).in_fundamental_sector()
-        angles = _jit_angle_with(vecs.data, zone_axis.data)
-        if degrees:
-            angles = np.rad2deg(angles)
-        return angles
-
-    def find_tilt_angles(
-        self,
-        zone_axis: Miller,
-        degrees: bool = True,
-        use_mean_orientation: bool = False,
-    ) -> tuple[float, ...]:
-        """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
-
-        Args:
-            zone_axis (Miller): desired zone axis
-
-        Returns:
-            tuple[float, ...]: Tilt angles for each axis
-
-        """
-
-        if use_mean_orientation:
-            optimize = self._optimize_mean_orientation_func(zone_axis, degrees)
-        else:
-            optimize = self._optimize_angle_with_func(zone_axis, degrees)
-
-        bounds = [(ax.min, ax.max) for ax in self.axes]
-        angles = self.angles
-        if degrees:
-            bounds = np.rad2deg(bounds)
-            angles = np.rad2deg(angles)
-
-        res = minimize(
-            optimize,
-            angles,
-            bounds=bounds,
-            method="Nelder-Mead",
-        )
-
-        self.reset_rotation()
-
-        return res.x
-
     def plot_angle_with(
         self,
         zone_axis: Miller,
@@ -368,6 +362,14 @@ class Sample(SampleHolder):
 
     def to_signal(self) -> Signal1D:
         return Signal1D(self.orientations.data)
+
+    def angle_with(self, zone_axis: Miller, degrees: bool = True) -> np.ndarray:
+        """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample."""
+        vecs = (self.orientations * self.optical_axis).in_fundamental_sector()
+        angles = _jit_angle_with(vecs.data, zone_axis.data)
+        if degrees:
+            angles = np.rad2deg(angles)
+        return angles
 
     def mean_zone_axis(self) -> Miller:
         """Calculate the mean orientation in the sample, and return the zone axis.
