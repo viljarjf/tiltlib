@@ -1,9 +1,8 @@
 name: Build docs
 
 on:
-  push:
-    branches:    
-      - main
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -15,14 +14,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-pandoc@v2
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
       - name: Install
-        run: |
-          pip install .[docs]
+        run: pip install .[docs]
       - name: Sphinx build
-        run: |
-          sphinx-build -b html docs/source docs/build/html
+        run: make html
+        working-directory: docs
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:

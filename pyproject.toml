@@ -25,4 +25,4 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-xdist", "filelock"]
-docs = ["sphinx", "sphinx-rtd-theme", "nbsphinx",]
+docs = ["sphinx", "sphinx-rtd-theme", "nbsphinx", "IPython", "ipykernel",]
