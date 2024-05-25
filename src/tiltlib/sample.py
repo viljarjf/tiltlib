@@ -24,6 +24,15 @@ from tiltlib.sample_holder import Axis, SampleHolder
 class Sample(SampleHolder):
 
     def __init__(self, oris: Orientation, phase: Phase, axes: list[Axis]) -> None:
+        """Sample of spatially distinct orientations
+
+        :param oris: The orientations at each point of the sample
+        :type oris: Orientation
+        :param phase: Crystallographic phase of the sample. Only single-phase crystals are supported
+        :type phase: Phase
+        :param axes: Tilt axes
+        :type axes: list[Axis]
+        """
         SampleHolder.__init__(self, axes)
         self.phase = phase
         self._original_rotations = Rotation(oris.data.copy())
@@ -31,19 +40,38 @@ class Sample(SampleHolder):
         self.optical_axis = self.optical_axis_miller.unit
 
     @classmethod
-    def from_crystal_map(cls, xmap: CrystalMap, axes: list[Axis] = None) -> "Sample":
+    def from_crystal_map(cls, xmap: CrystalMap, axes: list[Axis]) -> "Sample":
+        """Initialize a Sample from a CrystalMap
+
+        :param xmap: Orientation map
+        :type xmap: CrystalMap
+        :param axes: Tilt axes
+        :type axes: list[Axis]
+        """
         oris = xmap.orientations.reshape(*xmap.shape)
         return cls(oris, xmap.phases[0], axes)
 
     @property
     def orientations(self) -> Orientation:
+        """The orientations of the sample at the current tilts
+
+        :return: Tilted orientations
+        :rtype: Orientation
+        """
         r = self._original_rotations
         r *= ~self._rotation
         o = Orientation(r.data, symmetry=self.phase.point_group)
         return o
 
     def crop(self, roi: BaseROI) -> "Sample":
-        """Crop the sample with a hyperspy ROI and return a new cropped sample"""
+        """Crop the sample with a hyperspy ROI and return a new cropped sample
+
+        :param roi: Region of interest to keep
+        :type roi: BaseROI
+        :raises NotImplementedError: If an unsupported ROI is supplied
+        :return: Cropped sample
+        :rtype: Sample
+        """
         if isinstance(roi, RectangularROI):
             top = int(roi.top)
             bottom = int(roi.bottom)
@@ -75,12 +103,15 @@ class Sample(SampleHolder):
     ) -> tuple[float, ...]:
         """Calculate the tilt angle(s) necessary to align the sample with a given optical axis
 
-        Args:
-            zone_axis (Miller): desired zone axis
-
-        Returns:
-            tuple[float, ...]: Tilt angles for each axis
-
+        :param zone_axis: The zone axis to align to
+        :type zone_axis: Miller
+        :param degrees: Whether to return degrees(True) or radians(False), defaults to True
+        :type degrees: bool, optional
+        :param use_mean_orientation: Whether to perform optimization using the mean orientation 
+        of the sample(True) or the mean angle with the zone axis(False), defaults to False
+        :type use_mean_orientation: bool, optional
+        :return: Tilt angles
+        :rtype: tuple[float, ...]
         """
 
         if use_mean_orientation:
@@ -108,8 +139,8 @@ class Sample(SampleHolder):
     def plot(self) -> plt.Figure:
         """Plot IPF colormap of the orientations at the given tilt angle(s)
 
-        Returns:
-            plt.Figure:
+        :return: IPFs
+        :rtype: plt.Figure
         """
         oris = self.orientations
         symmetry = oris.symmetry
@@ -138,8 +169,10 @@ class Sample(SampleHolder):
         return fig
 
     def plot_orientations(self) -> plt.Figure:
-        """
-        IPF scatterplot of orientations
+        """IPF scatterplot of orientations
+
+        :return: IPFs
+        :rtype: plt.Figure
         """
         fig = self.orientations.scatter(
             projection="ipf",
@@ -153,11 +186,9 @@ class Sample(SampleHolder):
     ) -> tuple[plt.Figure, Slider]:
         """Make a IPF colormap plot with a slider for the tilt angle of each tilt axis
 
-        Returns:
-            tuple[plt.Figure, tuple[Slider, ...]]: The figure, and a tuple of all the sliders
-
-        Note:
-            The sliders are returned with the figure to avoid their functionality being deleted when the function returns
+        :return: Figure and sliders. Returning the slider avoids their functionality 
+        being deleted when the function returns
+        :rtype: tuple[plt.Figure, Slider]
         """
 
         fig = plt.figure(layout="constrained")
@@ -211,6 +242,12 @@ class Sample(SampleHolder):
         return fig, tuple(sliders)
 
     def plot_orientations_interactive(self) -> tuple[plt.Figure, Slider]:
+        """Interactive scatterplot of the orientations, with sliders to control the tilt axes
+
+        :return: Figure and sliders. Returning the slider avoids their functionality 
+        being deleted when the function returns
+        :rtype: tuple[plt.Figure, Slider]
+        """
         fig = plt.figure(layout="constrained")
         spec = GridSpec(3, 6, fig, height_ratios=[7, 1, 1])
         x_ax = fig.add_subplot(spec[0, 0:2])
@@ -287,15 +324,18 @@ class Sample(SampleHolder):
         resolution: float = 1.0,
         use_mean_orientation: bool = False,
     ) -> plt.Figure:
-        """
-        Make a plot of similarity score as function of tilt angle(s).
+        """Make a plot of similarity score as function of tilt angle(s).
 
-        Args:
-            zone_axis (Miller): desired zone axis
-            resolution (float): Degrees between each sampling point. Defaults to 1
-
-        Returns:
-            plt.Figure
+        :param zone_axis: Zone axis to calculate for
+        :type zone_axis: Miller
+        :param resolution: Angular resolution of the tilt axes, in degrees, defaults to 1.0
+        :type resolution: float, optional
+        :param use_mean_orientation: Whether to perform optimization using the mean orientation 
+        of the sample(True) or the mean angle with the zone axis(False), defaults to False
+        :type use_mean_orientation: bool, optional
+        :raises NotImplementedError: If more than 2 tilt axes are present, as up to 2 are supported
+        :return: Line plot or colormap, depending on the number of tilt angles
+        :rtype: plt.Figure
         """
 
         if use_mean_orientation:
@@ -354,28 +394,42 @@ class Sample(SampleHolder):
         return fig
 
     def to_navigator(self) -> Signal1D:
-        """Get a IPF"""
-        # Might not actually be 2D, but the navigation signal is...
+        """Create a IPF-z colormap as a hyperspy signal
 
+        :return: IPF-z
+        :rtype: Signal1D
+        """
         ipfkey = IPFColorKeyTSL(
             self.orientations.symmetry, direction=Vector3d.zvector()
         )
 
         float_rgb = ipfkey.orientation2color(self.orientations)
-
         int_rgb = (float_rgb * 255).astype(np.uint8)
 
         s = Signal1D(int_rgb)
-
         s.change_dtype("rgb8")
 
         return s
 
     def to_signal(self) -> Signal1D:
+        """Hyperspy signal containing the quaternion data of the orientations at each sample point
+
+        :return: Quaternion data
+        :rtype: Signal1D
+        """
         return Signal1D(self.orientations.data)
 
     def angle_with(self, zone_axis: Miller, degrees: bool = True) -> np.ndarray:
-        """Calculate the angle between the optical axis and the target zone axis for all pixels in the sample."""
+        """Calculate the angle between the optical axis and the target zone axis, 
+        for all pixels in the sample.
+
+        :param zone_axis: Zone axis to calculate for
+        :type zone_axis: Miller
+        :param degrees: Whether to return output in degrees(True) or radians(False), defaults to True
+        :type degrees: bool, optional
+        :return: Array of angles at all points in the sample
+        :rtype: np.ndarray
+        """
         vecs = (self.orientations * self.optical_axis).in_fundamental_sector()
         angles = _jit_angle_with(vecs.data, zone_axis.data)
         if degrees:
@@ -384,7 +438,11 @@ class Sample(SampleHolder):
 
     def mean_zone_axis(self) -> Miller:
         """Calculate the mean orientation in the sample, and return the zone axis.
-        This is mostly useful for single-grain or cropped samples."""
+        This is mostly useful for single-grain or cropped samples.
+
+        :return: Zone axis
+        :rtype: Miller
+        """
         return (self.orientations.mean() * self.optical_axis_miller).round()
 
     def _optimize_angle_with_func(

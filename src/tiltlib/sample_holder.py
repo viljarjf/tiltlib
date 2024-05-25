@@ -8,10 +8,12 @@ from tiltlib.axis import Axis
 
 class SampleHolder:
     def __init__(self, axes: list[Axis] = None) -> None:
-        """The first axis is always extrinsic.
+        """Handles the rotation of a sample holder in a TEM.
+        The first axis is always extrinsic.
 
-        Args:
-            axes (list[Axis], optional): axes, in order
+        :param axes: Tilt axes, in order, defaults to None
+        :type axes: list[Axis], optional
+        :raises ValueError: If :code:axes contains a non-:code:Axis instance
         """
         if axes is None:
             axes = []
@@ -29,6 +31,8 @@ class SampleHolder:
 
     @property
     def angles(self) -> list[float]:
+        """Current tilt angles, in radians
+        """
         return list(axis.angle for axis in self.axes)
 
     @property
@@ -42,7 +46,8 @@ class SampleHolder:
             self.axes[i].angle = float(angle)
 
     def _check_angles(self, angles: list[float]) -> None:
-        """Raises an appropriate error if the submitted angles are incompatible with the sample holder"""
+        """Raises an appropriate error if the submitted angles are incompatible with the sample holder
+        """
         if len(angles) == 1 and isinstance(angles[0], (list, tuple, np.ndarray)):
             angles = angles[0]
         if len(angles) > len(self.angles):
@@ -62,14 +67,15 @@ class SampleHolder:
             )
 
     def reset_rotation(self):
-        """Resets the sample holder to the angles it was initialized with"""
+        """Resets the sample holder to the angles it was initialized with
+        """
         self.rotate_to(self._initial_angles)
 
     def rotate_to(self, *angles: float, degrees: bool = False):
         """Sets the angles of all rotation axes to the given angles
 
-        Args:
-            degrees (bool, optional): Whether the given angles are in degrees or radians. Defaults to False.
+        :param degrees: Whether angles are in degrees(True) or radians(False), defaults to False
+        :type degrees: bool, optional
         """
         if len(angles) == 1 and isinstance(angles[0], (list, tuple, np.ndarray)):
             angles = angles[0]
@@ -80,8 +86,8 @@ class SampleHolder:
     def rotate(self, *angles: float, degrees: bool = False):
         """Rotates the sample holder by the given angles from the current position
 
-        Args:
-            degrees (bool, optional): Whether the given angles are in degrees or radians. Defaults to False.
+        :param degrees: Whether angles are in degrees(True) or radians(False), defaults to False
+        :type degrees: bool, optional
         """
         if len(angles) == 1 and isinstance(angles[0], (list, tuple, np.ndarray)):
             angles = angles[0]
@@ -104,14 +110,33 @@ class SampleHolder:
         return R
 
     def rotation_matrix(self) -> np.ndarray:
-        """Returns the 3x3 rotation matrix transforming the TEM coordinate system to the sample holder coordinate system"""
+        """Returns the 3x3 rotation matrix transforming the 
+        TEM coordinate system to the sample holder coordinate system
+
+        :return: Rotation matrix
+        :rtype: np.ndarray
+        """
         return self._rotation.to_matrix().squeeze()
 
     to_matrix = rotation_matrix
     as_matrix = rotation_matrix
 
     def sample_frame_to_TEM_frame(self, v: Vector3d) -> Vector3d:
+        """Convert a vector in sample coordinates to TEM coordinates
+
+        :param v: Sample vector
+        :type v: Vector3d
+        :return: TEM vector
+        :rtype: Vector3d
+        """
         return self._rotation * v
 
     def TEM_frame_to_sample_frame(self, v: Vector3d) -> Vector3d:
+        """Convert a vector in TEM coordinates to sample coordinates
+
+        :param v: TEM vector
+        :type v: Vector3d
+        :return: Sample vector
+        :rtype: Vector3d
+        """
         return ~self._rotation * v
