@@ -25,6 +25,11 @@ class Axis:
 
     @property
     def R(self) -> Rotation:
+        """The rotation of the axis as a quaternion
+
+        :return: rotation
+        :rtype: Rotation
+        """
         return Rotation.from_axes_angles(
             self.direction, self.angle - self._initial_angle
         )
