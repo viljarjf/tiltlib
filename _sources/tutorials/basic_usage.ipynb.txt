@@ -1,0 +1,233 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Basic Usage\n",
+    "\n",
+    "This tutorial will go through the basic usage of tiltlib, such as how to initialize a sample, and plotting"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Import the necessary packages\n",
+    "%matplotlib inline\n",
+    "from orix.vector import Miller, Vector3d\n",
+    "import numpy as np\n",
+    "\n",
+    "from tiltlib import Axis, Sample"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Axis initialization\n",
+    "To rotate a sample, one needs rotation axes.\n",
+    "In tiltlib, these are represented as `Axis` objects.\n",
+    "These are initialized with a direction and a tilt range."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "x_tilt_axis = Axis(\n",
+    "    Vector3d.xvector(),\n",
+    "    min = -30,\n",
+    "    max = 30,\n",
+    "    degrees = True,\n",
+    ")\n",
+    "x_tilt_axis"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Sample initialization\n",
+    "\n",
+    "The main workhorse of tiltlib is the `Sample`. \n",
+    "This object consists of crystal orientations, and rotation axes.\n",
+    "\n",
+    "This can be initialized in two ways: with a `CrystalMap` from Orix, or with `Orientation` and a `Phase` (also from Orix). "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "## Orientations\n",
+    "\n",
+    "from orix.quaternion import Orientation\n",
+    "from orix.crystal_map import Phase\n",
+    "\n",
+    "# Make a hexagonal crystal.\n",
+    "# The default lattice is cubic, so we edit it\n",
+    "phase = Phase(point_group=\"6/mmm\")\n",
+    "phase.structure.lattice.setLatPar(gamma=120)\n",
+    "\n",
+    "# Make some random data\n",
+    "oris = Orientation.random((10, 10))\n",
+    "oris.symmetry = phase.point_group\n",
+    "oris = oris.map_into_symmetry_reduced_zone()\n",
+    "\n",
+    "# Initialize the sample\n",
+    "sample = Sample(oris, phase, [x_tilt_axis])\n",
+    "sample"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "## CrystalMap\n",
+    "\n",
+    "# Download a crystal map supplied by Orix\n",
+    "from orix.data import sdss_austenite\n",
+    "raw_xmap = sdss_austenite(allow_download=True)\n",
+    "\n",
+    "# Initialize the sample object\n",
+    "sample = Sample.from_crystal_map(raw_xmap, [x_tilt_axis])\n",
+    "\n",
+    "sample"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Cropping\n",
+    "\n",
+    "`Sample`s can be cropped with Hyperspy ROIs"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Create an IPF navigation signal\n",
+    "nav = sample.to_navigator()\n",
+    "nav.plot()\n",
+    "\n",
+    "# Create ROIs\n",
+    "from hyperspy.roi import RectangularROI, CircleROI\n",
+    "\n",
+    "rect = RectangularROI(left=81, top=24, right=96, bottom=32)\n",
+    "rect.interactive(nav, color=\"black\")\n",
+    "\n",
+    "circ = CircleROI(cx=47, cy=55, r=5.5, r_inner=0)\n",
+    "\n",
+    "# For some reason, numpy throws an error with the circle\n",
+    "try:\n",
+    "    circ.interactive(nav, color=\"black\")\n",
+    "except np.exceptions.DTypePromotionError:\n",
+    "    pass"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rect_sample = sample.crop(rect)\n",
+    "circ_sample = sample.crop(circ)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Plotting\n",
+    "\n",
+    "There are multiple plotting tools directly available from the `Sample` object.\n",
+    "Additionally, the `Orientation` member is always up-to-date with the rotation of the sample, making them available for custom plotting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "## IPF colormap\n",
+    "sample.plot()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "## Orientations as IPF scatterplot\n",
+    "# Use one of the crops, as the full sample has so many different orientations\n",
+    "rect_sample.plot_orientations()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Interactive plotting\n",
+    "\n",
+    "Some plotting functionality of tiltlib is interactive, where you control the tilt axes with sliders"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# IPF colormaps\n",
+    "sample.plot_interactive()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# IPF scatterplot\n",
+    "circ_sample.plot_orientations_interactive()"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": ".venv",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.11"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

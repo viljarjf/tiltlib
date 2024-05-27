@@ -1,0 +1,366 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Zone axis alignment\n",
+    "\n",
+    "In this notebook, we will calculate the necessary angles to tilt the sample such that a given zone axis is aligned with the optical axis."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Import the necessary packages\n",
+    "%matplotlib inline\n",
+    "from orix.vector import Vector3d, Miller\n",
+    "import numpy as np\n",
+    "\n",
+    "from tiltlib import Axis, Sample"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Load data\n",
+    "\n",
+    "We use Orix's austenite crystal map, and a double-tilt sample holder with axes offset by 30 degrees to the scan."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from orix.data import sdss_austenite\n",
+    "\n",
+    "# This is the raw data we will use\n",
+    "raw_xmap = sdss_austenite(allow_download=True)\n",
+    "\n",
+    "# Define the tilt axes of the sample holder.\n",
+    "# If these are not known, refer to the `tilt_axis_identification.ipynb` example notebook.\n",
+    "x_tilt_axis = Axis(\n",
+    "    Vector3d.xvector().rotate(Vector3d.zvector(), np.deg2rad(30)),\n",
+    "    min=-30, \n",
+    "    max=30,\n",
+    "    angle=0,\n",
+    "    intrinsic=False,\n",
+    ")\n",
+    "y_tilt_axis = Axis(\n",
+    "    Vector3d.yvector().rotate(Vector3d.zvector(), np.deg2rad(30)),\n",
+    "    min=-30, \n",
+    "    max=30,\n",
+    "    angle=0,\n",
+    "    intrinsic=True,\n",
+    ") \n",
+    "\n",
+    "# Initialize the sample object\n",
+    "sample = Sample.from_crystal_map(raw_xmap, [x_tilt_axis, y_tilt_axis])\n",
+    "\n",
+    "figure = sample.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If you have your own data, replace the axes and crystal map with your own. Remember to assign the correct initial tilt angles to the axes."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Grain selection\n",
+    "\n",
+    "We choose a grain as a target for our optimization with a hyperspy ROI.\n",
+    "Both a box ROI and a circle ROI are supported."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# For example purposes, we have used %matplotlib inline. This makes the plot static.\n",
+    "# For an interactive experience, use e.g. %matplotlib qt5 (needs PyQt5 installed)\n",
+    "\n",
+    "# Make a navigation signal, to have an interactive ROI.\n",
+    "nav = sample.to_navigator()\n",
+    "nav.plot()\n",
+    "\n",
+    "from hyperspy.roi import RectangularROI\n",
+    "\n",
+    "box = RectangularROI(left=72, top=66, right=83, bottom=72)\n",
+    "box.interactive(nav, color=\"black\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "box_crop = sample.crop(box)\n",
+    "box_crop.plot()\n",
+    "print(box_crop.mean_zone_axis())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "From the green color, observe that the chosen grain is quite close to [1 0 1]. We will try to align it to that zone axis."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Find the tilt angles\n",
+    "\n",
+    "Now, we choose a miller index, here [1 0 1], and find the angles necessary for aligning the grain to that zone axis."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "target = Miller(uvw=[1, 0, 1], phase=sample.phase)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The chosen grain is quite uniform. Therefore, we can choose to optimize using the mean orientation, instead of using the mean angle after using all orientations.\n",
+    "This can provide significant speedup."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "box_angles = box_crop.find_tilt_angles(target, use_mean_orientation=True)\n",
+    "print(f\"{box_angles = } degrees\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can verify the results by calculating the mean zone axis of the crop after rotation, and plotting the sample to see the green color we expect."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "box_crop.rotate_to(*box_angles, degrees=True)\n",
+    "print(box_crop.mean_zone_axis())\n",
+    "\n",
+    "sample.rotate_to(*box_angles, degrees=True)\n",
+    "figure = sample.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The grain was indeed close to $\\left[1\\,0\\,1\\right]$, since we only needed to tilt about 5 degrees.\n",
+    "Note that we found the symmetrically equivalent $\\left[0\\,\\bar{1}\\,1\\right]$ rather than $\\left[1\\,0\\,1\\right]$."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Twin alignment\n",
+    "\n",
+    "Next, we will try to align two twin grains to the same zone simultaneously."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "nav = sample.to_navigator()\n",
+    "nav.plot()\n",
+    "\n",
+    "from hyperspy.roi import CircleROI\n",
+    "\n",
+    "circle = CircleROI(cx=32, cy=23, r=7, r_inner=0)\n",
+    "\n",
+    "# Ignore an error which does not affect us\n",
+    "try:\n",
+    "    circle.interactive(nav, color=\"black\")\n",
+    "except np.exceptions.DTypePromotionError:\n",
+    "    pass\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "These should be $\\Sigma3$ twins, and should share a $\\left[1\\,0\\,1\\right]$ zone. We use that as target."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "circle_crop = sample.crop(circle)\n",
+    "target = Miller(uvw=[1, 0, 1], phase=sample.phase)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To align on multiple grains simultaneously, we no longer want to use the mean orientation.\n",
+    "Since we have two populations of orientations, the mean is not representative of either.\n",
+    "Therefore, we set `use_mean_orientation` to `False`, which is the default value."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "circle_angles = circle_crop.find_tilt_angles(target, use_mean_orientation=False)\n",
+    "print(f\"{circle_angles = } degrees\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Once again, we can verify by plotting the IPF colormap after tilting, and observe that both grains are indeed aligned with $\\left[1\\,0\\,1\\right]$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sample.rotate_to(*circle_angles, degrees=True)\n",
+    "fig = sample.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Additionally, we can show how the mean is not representative (before alignment, at least), by adding it to the z-IPF in red:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fig_before = circle_crop.plot_orientations()\n",
+    "mean_zone = circle_crop.mean_zone_axis()\n",
+    "fig_before.axes[-1].scatter(mean_zone, color=\"red\")\n",
+    "fig_before.suptitle(\"Before tilting\")\n",
+    "\n",
+    "circle_crop.rotate_to(*circle_angles, degrees=True)\n",
+    "fig_after = circle_crop.plot_orientations()\n",
+    "mean_zone = circle_crop.mean_zone_axis()\n",
+    "fig_after.axes[-1].scatter(mean_zone, color=\"red\")\n",
+    "fig_after.suptitle(\"After tilting\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Plot the optimization landscape\n",
+    "\n",
+    "Sometimes, the alignment algorithm will encounter degenerate minima in the optimization landscape.\n",
+    "This can be caused by symmetrically equivalent zones being available within the tilt range of the axes.\n",
+    "However, tiltlib does not check if this is the case.\n",
+    "We can check ourselves by plotting the optimization landscape."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Degenerate minima\n",
+    "target = Miller(uvw=[2, 2, 3], phase=sample.phase)\n",
+    "fig = box_crop.plot_angle_with(target)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Single minimum\n",
+    "target = Miller(uvw=[1, 0, 2], phase=sample.phase)\n",
+    "fig = circle_crop.plot_angle_with(target)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can also show how using the mean orientation would look like for the twins, which should yield a completely different optimization landscape:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fig = circle_crop.plot_angle_with(target, use_mean_orientation=True)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": ".venv",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.11"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

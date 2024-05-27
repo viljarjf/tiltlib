@@ -1,0 +1,40 @@
+tiltlib.sample\_holder.SampleHolder
+===================================
+
+.. currentmodule:: tiltlib.sample_holder
+
+.. autoclass:: SampleHolder
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SampleHolder.TEM_frame_to_sample_frame
+      ~SampleHolder.__init__
+      ~SampleHolder.as_matrix
+      ~SampleHolder.reset_rotation
+      ~SampleHolder.rotate
+      ~SampleHolder.rotate_to
+      ~SampleHolder.rotation_matrix
+      ~SampleHolder.sample_frame_to_TEM_frame
+      ~SampleHolder.to_matrix
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SampleHolder.angles
+   
+   

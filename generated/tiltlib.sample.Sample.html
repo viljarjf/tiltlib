@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tiltlib.sample.Sample &mdash; tiltlib 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tiltlib.sample_holder" href="tiltlib.sample_holder.html" />
+    <link rel="prev" title="tiltlib.sample" href="tiltlib.sample.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tiltlib
+          </a>
+              <div class="version">
+                0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tiltlib.html">tiltlib</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tiltlib.axis.html">tiltlib.axis</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="tiltlib.sample.html">tiltlib.sample</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tiltlib.sample.Sample</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tiltlib.sample.Sample"><code class="docutils literal notranslate"><span class="pre">Sample</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tiltlib.sample_holder.html">tiltlib.sample_holder</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribution.html">Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tiltlib</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">&lt;no title&gt;</a></li>
+          <li class="breadcrumb-item"><a href="tiltlib.html">tiltlib</a></li>
+          <li class="breadcrumb-item"><a href="tiltlib.sample.html">tiltlib.sample</a></li>
+      <li class="breadcrumb-item active">tiltlib.sample.Sample</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/tiltlib.sample.Sample.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tiltlib-sample-sample">
+<h1>tiltlib.sample.Sample<a class="headerlink" href="#tiltlib-sample-sample" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tiltlib.sample.</span></span><span class="sig-name descname"><span class="pre">Sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oris</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Orientation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="tiltlib.axis.Axis.html#tiltlib.axis.Axis" title="tiltlib.axis.Axis"><span class="pre">Axis</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="tiltlib.sample_holder.SampleHolder.html#tiltlib.sample_holder.SampleHolder" title="tiltlib.sample_holder.SampleHolder"><code class="xref py py-class docutils literal notranslate"><span class="pre">SampleHolder</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oris</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Orientation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="tiltlib.axis.Axis.html#tiltlib.axis.Axis" title="tiltlib.axis.Axis"><span class="pre">Axis</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.__init__" title="Link to this definition"></a></dt>
+<dd><p>Sample of spatially distinct orientations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>oris</strong> (<em>Orientation</em>) – The orientations at each point of the sample</p></li>
+<li><p><strong>phase</strong> (<em>Phase</em>) – Crystallographic phase of the sample. Only single-phase crystals are supported</p></li>
+<li><p><strong>axes</strong> (<em>list</em><em>[</em><a class="reference internal" href="tiltlib.axis.Axis.html#tiltlib.axis.Axis" title="tiltlib.axis.Axis"><em>Axis</em></a><em>]</em>) – Tilt axes</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.TEM_frame_to_sample_frame" title="tiltlib.sample.Sample.TEM_frame_to_sample_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEM_frame_to_sample_frame</span></code></a>(v)</p></td>
+<td><p>Convert a vector in TEM coordinates to sample coordinates</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.__init__" title="tiltlib.sample.Sample.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(oris, phase, axes)</p></td>
+<td><p>Sample of spatially distinct orientations</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.angle_with" title="tiltlib.sample.Sample.angle_with"><code class="xref py py-obj docutils literal notranslate"><span class="pre">angle_with</span></code></a>(zone_axis[, degrees])</p></td>
+<td><p>Calculate the angle between the optical axis and the target zone axis,  for all pixels in the sample.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.as_matrix" title="tiltlib.sample.Sample.as_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_matrix</span></code></a>()</p></td>
+<td><p>Returns the 3x3 rotation matrix transforming the  TEM coordinate system to the sample holder coordinate system</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.crop" title="tiltlib.sample.Sample.crop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crop</span></code></a>(roi)</p></td>
+<td><p>Crop the sample with a hyperspy ROI and return a new cropped sample</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.find_tilt_angles" title="tiltlib.sample.Sample.find_tilt_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_tilt_angles</span></code></a>(zone_axis[, degrees, ...])</p></td>
+<td><p>Calculate the tilt angle(s) necessary to align the sample with a given optical axis</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.from_crystal_map" title="tiltlib.sample.Sample.from_crystal_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_crystal_map</span></code></a>(xmap, axes)</p></td>
+<td><p>Initialize a Sample from a CrystalMap</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.mean_zone_axis" title="tiltlib.sample.Sample.mean_zone_axis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_zone_axis</span></code></a>()</p></td>
+<td><p>Calculate the mean orientation in the sample, and return the zone axis.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.plot" title="tiltlib.sample.Sample.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>()</p></td>
+<td><p>Plot IPF colormap of the orientations at the given tilt angle(s)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.plot_angle_with" title="tiltlib.sample.Sample.plot_angle_with"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_angle_with</span></code></a>(zone_axis[, resolution, ...])</p></td>
+<td><p>Make a plot of similarity score as function of tilt angle(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.plot_interactive" title="tiltlib.sample.Sample.plot_interactive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_interactive</span></code></a>()</p></td>
+<td><p>Make a IPF colormap plot with a slider for the tilt angle of each tilt axis</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.plot_orientations" title="tiltlib.sample.Sample.plot_orientations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_orientations</span></code></a>()</p></td>
+<td><p>IPF scatterplot of orientations</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.plot_orientations_interactive" title="tiltlib.sample.Sample.plot_orientations_interactive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_orientations_interactive</span></code></a>()</p></td>
+<td><p>Interactive scatterplot of the orientations, with sliders to control the tilt axes</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.reset_rotation" title="tiltlib.sample.Sample.reset_rotation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_rotation</span></code></a>()</p></td>
+<td><p>Resets the sample holder to the angles it was initialized with</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.rotate" title="tiltlib.sample.Sample.rotate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate</span></code></a>(*angles[, degrees])</p></td>
+<td><p>Rotates the sample holder by the given angles from the current position</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.rotate_to" title="tiltlib.sample.Sample.rotate_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate_to</span></code></a>(*angles[, degrees])</p></td>
+<td><p>Sets the angles of all rotation axes to the given angles</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.rotation_matrix" title="tiltlib.sample.Sample.rotation_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotation_matrix</span></code></a>()</p></td>
+<td><p>Returns the 3x3 rotation matrix transforming the  TEM coordinate system to the sample holder coordinate system</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.sample_frame_to_TEM_frame" title="tiltlib.sample.Sample.sample_frame_to_TEM_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_frame_to_TEM_frame</span></code></a>(v)</p></td>
+<td><p>Convert a vector in sample coordinates to TEM coordinates</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.to_matrix" title="tiltlib.sample.Sample.to_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_matrix</span></code></a>()</p></td>
+<td><p>Returns the 3x3 rotation matrix transforming the  TEM coordinate system to the sample holder coordinate system</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.to_navigator" title="tiltlib.sample.Sample.to_navigator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_navigator</span></code></a>()</p></td>
+<td><p>Create a IPF-z colormap as a hyperspy signal</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.to_signal" title="tiltlib.sample.Sample.to_signal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_signal</span></code></a>()</p></td>
+<td><p>Hyperspy signal containing the quaternion data of the orientations at each sample point</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.angles" title="tiltlib.sample.Sample.angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">angles</span></code></a></p></td>
+<td><p>Current tilt angles, in radians</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tiltlib.sample.Sample.orientations" title="tiltlib.sample.Sample.orientations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orientations</span></code></a></p></td>
+<td><p>The orientations of the sample at the current tilts</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.TEM_frame_to_sample_frame">
+<span class="sig-name descname"><span class="pre">TEM_frame_to_sample_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Vector3d</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Vector3d</span></span></span><a class="headerlink" href="#tiltlib.sample.Sample.TEM_frame_to_sample_frame" title="Link to this definition"></a></dt>
+<dd><p>Convert a vector in TEM coordinates to sample coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>Vector3d</em>) – TEM vector</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sample vector</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector3d</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.angle_with">
+<span class="sig-name descname"><span class="pre">angle_with</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zone_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Miller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degrees</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.angle_with"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.angle_with" title="Link to this definition"></a></dt>
+<dd><p>Calculate the angle between the optical axis and the target zone axis, 
+for all pixels in the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>zone_axis</strong> (<em>Miller</em>) – Zone axis to calculate for</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to return output in degrees(True) or radians(False), defaults to True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array of angles at all points in the sample</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.angles">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">angles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#tiltlib.sample.Sample.angles" title="Link to this definition"></a></dt>
+<dd><p>Current tilt angles, in radians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.as_matrix">
+<span class="sig-name descname"><span class="pre">as_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#tiltlib.sample.Sample.as_matrix" title="Link to this definition"></a></dt>
+<dd><p>Returns the 3x3 rotation matrix transforming the 
+TEM coordinate system to the sample holder coordinate system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Rotation matrix</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.crop">
+<span class="sig-name descname"><span class="pre">crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseROI</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#tiltlib.sample.Sample" title="tiltlib.sample.Sample"><span class="pre">Sample</span></a></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.crop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.crop" title="Link to this definition"></a></dt>
+<dd><p>Crop the sample with a hyperspy ROI and return a new cropped sample</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>roi</strong> (<em>BaseROI</em>) – Region of interest to keep</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – If an unsupported ROI is supplied</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cropped sample</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#tiltlib.sample.Sample" title="tiltlib.sample.Sample">Sample</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.find_tilt_angles">
+<span class="sig-name descname"><span class="pre">find_tilt_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zone_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Miller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degrees</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_mean_orientation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.find_tilt_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.find_tilt_angles" title="Link to this definition"></a></dt>
+<dd><p>Calculate the tilt angle(s) necessary to align the sample with a given optical axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>zone_axis</strong> (<em>Miller</em>) – The zone axis to align to</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to return degrees(True) or radians(False), defaults to True</p></li>
+<li><p><strong>use_mean_orientation</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to perform optimization using the mean orientation of the sample(True) or the mean angle with the zone axis(False), defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tilt angles</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[float, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.from_crystal_map">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_crystal_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xmap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CrystalMap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="tiltlib.axis.Axis.html#tiltlib.axis.Axis" title="tiltlib.axis.Axis"><span class="pre">Axis</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#tiltlib.sample.Sample" title="tiltlib.sample.Sample"><span class="pre">Sample</span></a></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.from_crystal_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.from_crystal_map" title="Link to this definition"></a></dt>
+<dd><p>Initialize a Sample from a CrystalMap</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xmap</strong> (<em>CrystalMap</em>) – Orientation map</p></li>
+<li><p><strong>axes</strong> (<em>list</em><em>[</em><a class="reference internal" href="tiltlib.axis.Axis.html#tiltlib.axis.Axis" title="tiltlib.axis.Axis"><em>Axis</em></a><em>]</em>) – Tilt axes</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.mean_zone_axis">
+<span class="sig-name descname"><span class="pre">mean_zone_axis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Miller</span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.mean_zone_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.mean_zone_axis" title="Link to this definition"></a></dt>
+<dd><p>Calculate the mean orientation in the sample, and return the zone axis.
+This is mostly useful for single-grain or cropped samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Zone axis</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Miller</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.orientations">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">orientations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Orientation</span></em><a class="headerlink" href="#tiltlib.sample.Sample.orientations" title="Link to this definition"></a></dt>
+<dd><p>The orientations of the sample at the current tilts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tilted orientations</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Orientation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.plot" title="Link to this definition"></a></dt>
+<dd><p>Plot IPF colormap of the orientations at the given tilt angle(s)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>IPFs</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>plt.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.plot_angle_with">
+<span class="sig-name descname"><span class="pre">plot_angle_with</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zone_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Miller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_mean_orientation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.plot_angle_with"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.plot_angle_with" title="Link to this definition"></a></dt>
+<dd><p>Make a plot of similarity score as function of tilt angle(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>zone_axis</strong> (<em>Miller</em>) – Zone axis to calculate for</p></li>
+<li><p><strong>resolution</strong> (<em>float</em><em>, </em><em>optional</em>) – Angular resolution of the tilt axes, in degrees, defaults to 1.0</p></li>
+<li><p><strong>use_mean_orientation</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to perform optimization using the mean orientation of the sample(True) or the mean angle with the zone axis(False), defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – If more than 2 tilt axes are present, as up to 2 are supported</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Line plot or colormap, depending on the number of tilt angles</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>plt.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.plot_interactive">
+<span class="sig-name descname"><span class="pre">plot_interactive</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Figure</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Slider</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.plot_interactive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.plot_interactive" title="Link to this definition"></a></dt>
+<dd><p>Make a IPF colormap plot with a slider for the tilt angle of each tilt axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Figure and sliders. Returning the slider avoids their functionality being deleted when the function returns</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[plt.Figure, Slider]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.plot_orientations">
+<span class="sig-name descname"><span class="pre">plot_orientations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.plot_orientations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.plot_orientations" title="Link to this definition"></a></dt>
+<dd><p>IPF scatterplot of orientations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>IPFs</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>plt.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.plot_orientations_interactive">
+<span class="sig-name descname"><span class="pre">plot_orientations_interactive</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Figure</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Slider</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.plot_orientations_interactive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.plot_orientations_interactive" title="Link to this definition"></a></dt>
+<dd><p>Interactive scatterplot of the orientations, with sliders to control the tilt axes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Figure and sliders. Returning the slider avoids their functionality being deleted when the function returns</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[plt.Figure, Slider]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.reset_rotation">
+<span class="sig-name descname"><span class="pre">reset_rotation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tiltlib.sample.Sample.reset_rotation" title="Link to this definition"></a></dt>
+<dd><p>Resets the sample holder to the angles it was initialized with</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">angles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degrees</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tiltlib.sample.Sample.rotate" title="Link to this definition"></a></dt>
+<dd><p>Rotates the sample holder by the given angles from the current position</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angles</strong> (<em>float</em>) – tilt angles, in order of tilt axes</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether angles are in degrees(True) or radians(False), defaults to False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.rotate_to">
+<span class="sig-name descname"><span class="pre">rotate_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">angles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degrees</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tiltlib.sample.Sample.rotate_to" title="Link to this definition"></a></dt>
+<dd><p>Sets the angles of all rotation axes to the given angles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angles</strong> (<em>float</em>) – tilt angles, in order of tilt axes</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether angles are in degrees(True) or radians(False), defaults to False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.rotation_matrix">
+<span class="sig-name descname"><span class="pre">rotation_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#tiltlib.sample.Sample.rotation_matrix" title="Link to this definition"></a></dt>
+<dd><p>Returns the 3x3 rotation matrix transforming the 
+TEM coordinate system to the sample holder coordinate system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Rotation matrix</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.sample_frame_to_TEM_frame">
+<span class="sig-name descname"><span class="pre">sample_frame_to_TEM_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Vector3d</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Vector3d</span></span></span><a class="headerlink" href="#tiltlib.sample.Sample.sample_frame_to_TEM_frame" title="Link to this definition"></a></dt>
+<dd><p>Convert a vector in sample coordinates to TEM coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>Vector3d</em>) – Sample vector</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>TEM vector</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector3d</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.to_matrix">
+<span class="sig-name descname"><span class="pre">to_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#tiltlib.sample.Sample.to_matrix" title="Link to this definition"></a></dt>
+<dd><p>Returns the 3x3 rotation matrix transforming the 
+TEM coordinate system to the sample holder coordinate system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Rotation matrix</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.to_navigator">
+<span class="sig-name descname"><span class="pre">to_navigator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Signal1D</span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.to_navigator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.to_navigator" title="Link to this definition"></a></dt>
+<dd><p>Create a IPF-z colormap as a hyperspy signal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>IPF-z</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Signal1D</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tiltlib.sample.Sample.to_signal">
+<span class="sig-name descname"><span class="pre">to_signal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Signal1D</span></span></span><a class="reference internal" href="../_modules/tiltlib/sample.html#Sample.to_signal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiltlib.sample.Sample.to_signal" title="Link to this definition"></a></dt>
+<dd><p>Hyperspy signal containing the quaternion data of the orientations at each sample point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Quaternion data</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Signal1D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tiltlib.sample.html" class="btn btn-neutral float-left" title="tiltlib.sample" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tiltlib.sample_holder.html" class="btn btn-neutral float-right" title="tiltlib.sample_holder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Viljar Femoen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+tiltlib.axis.Axis
+=================
+
+.. currentmodule:: tiltlib.axis
+
+.. autoclass:: Axis
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Axis.__init__
+      ~Axis.copy
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Axis.R
+      ~Axis.angle
+      ~Axis.degrees
+      ~Axis.extrinsic
+      ~Axis.intrinsic
+      ~Axis.direction
+      ~Axis.min
+      ~Axis.max
+   
+   

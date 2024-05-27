@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tiltlib.sample &mdash; tiltlib 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            tiltlib
+          </a>
+              <div class="version">
+                0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/tiltlib.html">tiltlib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contribution.html">Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">tiltlib</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">tiltlib.sample</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tiltlib.sample</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.gridspec</span> <span class="kn">import</span> <span class="n">GridSpec</span>
+<span class="kn">from</span> <span class="nn">matplotlib.widgets</span> <span class="kn">import</span> <span class="n">Slider</span>
+<span class="kn">from</span> <span class="nn">orix.crystal_map</span> <span class="kn">import</span> <span class="n">CrystalMap</span><span class="p">,</span> <span class="n">Phase</span>
+<span class="kn">from</span> <span class="nn">orix.plot</span> <span class="kn">import</span> <span class="n">IPFColorKeyTSL</span>
+<span class="kn">from</span> <span class="nn">orix.plot.inverse_pole_figure_plot</span> <span class="kn">import</span> <span class="n">_get_ipf_axes_labels</span>
+<span class="kn">from</span> <span class="nn">orix.quaternion</span> <span class="kn">import</span> <span class="n">Orientation</span><span class="p">,</span> <span class="n">Rotation</span>
+<span class="kn">from</span> <span class="nn">orix.vector</span> <span class="kn">import</span> <span class="n">Vector3d</span><span class="p">,</span> <span class="n">Miller</span>
+<span class="kn">from</span> <span class="nn">orix.vector.fundamental_sector</span> <span class="kn">import</span> <span class="n">_closed_edges_in_hemisphere</span>
+<span class="kn">from</span> <span class="nn">orix.projections</span> <span class="kn">import</span> <span class="n">StereographicProjection</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+<span class="kn">from</span> <span class="nn">hyperspy.signals</span> <span class="kn">import</span> <span class="n">Signal1D</span>
+<span class="kn">from</span> <span class="nn">hyperspy.roi</span> <span class="kn">import</span> <span class="n">BaseROI</span><span class="p">,</span> <span class="n">CircleROI</span><span class="p">,</span> <span class="n">RectangularROI</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">njit</span>
+
+<span class="kn">from</span> <span class="nn">tiltlib.sample_holder</span> <span class="kn">import</span> <span class="n">Axis</span><span class="p">,</span> <span class="n">SampleHolder</span>
+
+
+<div class="viewcode-block" id="Sample">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample">[docs]</a>
+<span class="k">class</span> <span class="nc">Sample</span><span class="p">(</span><span class="n">SampleHolder</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Sample.__init__">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oris</span><span class="p">:</span> <span class="n">Orientation</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="n">Phase</span><span class="p">,</span> <span class="n">axes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axis</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample of spatially distinct orientations</span>
+
+<span class="sd">        :param oris: The orientations at each point of the sample</span>
+<span class="sd">        :type oris: Orientation</span>
+<span class="sd">        :param phase: Crystallographic phase of the sample. Only single-phase crystals are supported</span>
+<span class="sd">        :type phase: Phase</span>
+<span class="sd">        :param axes: Tilt axes</span>
+<span class="sd">        :type axes: list[Axis]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">SampleHolder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">phase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_rotations</span> <span class="o">=</span> <span class="n">Rotation</span><span class="p">(</span><span class="n">oris</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optical_axis_miller</span> <span class="o">=</span> <span class="n">Miller</span><span class="p">(</span><span class="n">uvw</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">phase</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optical_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optical_axis_miller</span><span class="o">.</span><span class="n">unit</span></div>
+
+
+<div class="viewcode-block" id="Sample.from_crystal_map">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.from_crystal_map">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_crystal_map</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">xmap</span><span class="p">:</span> <span class="n">CrystalMap</span><span class="p">,</span> <span class="n">axes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Axis</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sample&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a Sample from a CrystalMap</span>
+
+<span class="sd">        :param xmap: Orientation map</span>
+<span class="sd">        :type xmap: CrystalMap</span>
+<span class="sd">        :param axes: Tilt axes</span>
+<span class="sd">        :type axes: list[Axis]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">oris</span> <span class="o">=</span> <span class="n">xmap</span><span class="o">.</span><span class="n">orientations</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">xmap</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">oris</span><span class="p">,</span> <span class="n">xmap</span><span class="o">.</span><span class="n">phases</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axes</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orientations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Orientation</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The orientations of the sample at the current tilts</span>
+
+<span class="sd">        :return: Tilted orientations</span>
+<span class="sd">        :rtype: Orientation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_rotations</span>
+        <span class="n">r</span> <span class="o">*=</span> <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">Orientation</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">symmetry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">point_group</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">o</span>
+
+<div class="viewcode-block" id="Sample.crop">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.crop">[docs]</a>
+    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">:</span> <span class="n">BaseROI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sample&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crop the sample with a hyperspy ROI and return a new cropped sample</span>
+
+<span class="sd">        :param roi: Region of interest to keep</span>
+<span class="sd">        :type roi: BaseROI</span>
+<span class="sd">        :raises NotImplementedError: If an unsupported ROI is supplied</span>
+<span class="sd">        :return: Cropped sample</span>
+<span class="sd">        :rtype: Sample</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">RectangularROI</span><span class="p">):</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">top</span><span class="p">)</span>
+            <span class="n">bottom</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">bottom</span><span class="p">)</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+            <span class="n">slices</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">CircleROI</span><span class="p">):</span>
+            <span class="n">cx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">cx</span><span class="p">)</span>
+            <span class="n">cy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">cy</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">r</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_rotations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_rotations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">-=</span> <span class="n">cx</span>
+            <span class="n">y</span> <span class="o">-=</span> <span class="n">cy</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">slices</span> <span class="o">=</span> <span class="n">mask</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Supported ROIs are RectangularROI and CircleROI&quot;</span><span class="p">)</span>
+        <span class="n">oris</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_rotations</span><span class="p">[</span><span class="n">slices</span><span class="p">]</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">oris</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span> <span class="n">axes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sample.find_tilt_angles">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.find_tilt_angles">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_tilt_angles</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">zone_axis</span><span class="p">:</span> <span class="n">Miller</span><span class="p">,</span>
+        <span class="n">degrees</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_mean_orientation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the tilt angle(s) necessary to align the sample with a given optical axis</span>
+
+<span class="sd">        :param zone_axis: The zone axis to align to</span>
+<span class="sd">        :type zone_axis: Miller</span>
+<span class="sd">        :param degrees: Whether to return degrees(True) or radians(False), defaults to True</span>
+<span class="sd">        :type degrees: bool, optional</span>
+<span class="sd">        :param use_mean_orientation: Whether to perform optimization using the mean orientation of the sample(True) or the mean angle with the zone axis(False), defaults to False</span>
+<span class="sd">        :type use_mean_orientation: bool, optional</span>
+<span class="sd">        :return: Tilt angles</span>
+<span class="sd">        :rtype: tuple[float, ...]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">use_mean_orientation</span><span class="p">:</span>
+            <span class="n">optimize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimize_mean_orientation_func</span><span class="p">(</span><span class="n">zone_axis</span><span class="p">,</span> <span class="n">degrees</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">optimize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimize_angle_with_func</span><span class="p">(</span><span class="n">zone_axis</span><span class="p">,</span> <span class="n">degrees</span><span class="p">)</span>
+
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">[(</span><span class="n">ax</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">max</span><span class="p">)</span> <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">]</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span>
+        <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+            <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span>
+            <span class="n">optimize</span><span class="p">,</span>
+            <span class="n">angles</span><span class="p">,</span>
+            <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Nelder-Mead&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_rotation</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="Sample.plot">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot IPF colormap of the orientations at the given tilt angle(s)</span>
+
+<span class="sd">        :return: IPFs</span>
+<span class="sd">        :rtype: plt.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">oris</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientations</span>
+        <span class="n">symmetry</span> <span class="o">=</span> <span class="n">oris</span><span class="o">.</span><span class="n">symmetry</span>
+        <span class="n">ipfkey_x</span> <span class="o">=</span> <span class="n">IPFColorKeyTSL</span><span class="p">(</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">Vector3d</span><span class="o">.</span><span class="n">xvector</span><span class="p">())</span>
+        <span class="n">ipfkey_y</span> <span class="o">=</span> <span class="n">IPFColorKeyTSL</span><span class="p">(</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">Vector3d</span><span class="o">.</span><span class="n">yvector</span><span class="p">())</span>
+        <span class="n">ipfkey_z</span> <span class="o">=</span> <span class="n">IPFColorKeyTSL</span><span class="p">(</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">Vector3d</span><span class="o">.</span><span class="n">zvector</span><span class="p">())</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ipfkey_x</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="n">oris</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;IPF x&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ipfkey_y</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="n">oris</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;IPF y&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ipfkey_z</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="n">oris</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;IPF z&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="Sample.plot_orientations">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.plot_orientations">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_orientations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;IPF scatterplot of orientations</span>
+
+<span class="sd">        :return: IPFs</span>
+<span class="sd">        :rtype: plt.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;ipf&quot;</span><span class="p">,</span>
+            <span class="n">return_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">direction</span><span class="o">=</span><span class="n">Vector3d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="Sample.plot_interactive">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.plot_interactive">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_interactive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">,</span> <span class="n">Slider</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Make a IPF colormap plot with a slider for the tilt angle of each tilt axis</span>
+
+<span class="sd">        :return: Figure and sliders. Returning the slider avoids their functionality being deleted when the function returns</span>
+<span class="sd">        :rtype: tuple[plt.Figure, Slider]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="s2">&quot;constrained&quot;</span><span class="p">)</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">GridSpec</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">height_ratios</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">x_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">y_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">z_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
+
+        <span class="n">oris</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientations</span>
+        <span class="n">symmetry</span> <span class="o">=</span> <span class="n">oris</span><span class="o">.</span><span class="n">symmetry</span>
+        <span class="n">ipfkey_x</span> <span class="o">=</span> <span class="n">IPFColorKeyTSL</span><span class="p">(</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">Vector3d</span><span class="o">.</span><span class="n">xvector</span><span class="p">())</span>
+        <span class="n">ipfkey_y</span> <span class="o">=</span> <span class="n">IPFColorKeyTSL</span><span class="p">(</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">Vector3d</span><span class="o">.</span><span class="n">yvector</span><span class="p">())</span>
+        <span class="n">ipfkey_z</span> <span class="o">=</span> <span class="n">IPFColorKeyTSL</span><span class="p">(</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">Vector3d</span><span class="o">.</span><span class="n">zvector</span><span class="p">())</span>
+
+        <span class="n">x_im</span> <span class="o">=</span> <span class="n">x_ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ipfkey_x</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="n">oris</span><span class="p">))</span>
+        <span class="n">x_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;IPF x&quot;</span><span class="p">)</span>
+        <span class="n">x_ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="n">y_im</span> <span class="o">=</span> <span class="n">y_ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ipfkey_y</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="n">oris</span><span class="p">))</span>
+        <span class="n">y_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;IPF y&quot;</span><span class="p">)</span>
+        <span class="n">y_ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="n">z_im</span> <span class="o">=</span> <span class="n">z_ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ipfkey_z</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="n">oris</span><span class="p">))</span>
+        <span class="n">z_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;IPF z&quot;</span><span class="p">)</span>
+        <span class="n">z_ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="n">sliders</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Slider</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rotate_to</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">slider</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">slider</span> <span class="ow">in</span> <span class="n">sliders</span><span class="p">],</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">x_im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">ipfkey_x</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="p">))</span>
+            <span class="n">y_im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">ipfkey_y</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="p">))</span>
+            <span class="n">z_im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">ipfkey_z</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="p">))</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw_idle</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tilt_axis</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">):</span>
+            <span class="n">slider_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
+
+            <span class="n">tilt_slider</span> <span class="o">=</span> <span class="n">Slider</span><span class="p">(</span>
+                <span class="n">slider_ax</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Tilt axis </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> angle [deg]&quot;</span><span class="p">,</span>
+                <span class="n">valmin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">tilt_axis</span><span class="o">.</span><span class="n">min</span><span class="p">),</span>
+                <span class="n">valmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">tilt_axis</span><span class="o">.</span><span class="n">max</span><span class="p">),</span>
+                <span class="n">valinit</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">tilt_axis</span><span class="o">.</span><span class="n">angle</span><span class="p">),</span>
+                <span class="n">valfmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;#cc7000&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">tilt_slider</span><span class="o">.</span><span class="n">on_changed</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
+            <span class="n">sliders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tilt_slider</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">sliders</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sample.plot_orientations_interactive">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.plot_orientations_interactive">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_orientations_interactive</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">,</span> <span class="n">Slider</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interactive scatterplot of the orientations, with sliders to control the tilt axes</span>
+
+<span class="sd">        :return: Figure and sliders. Returning the slider avoids their functionality being deleted when the function returns</span>
+<span class="sd">        :rtype: tuple[plt.Figure, Slider]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="s2">&quot;constrained&quot;</span><span class="p">)</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">GridSpec</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">height_ratios</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">x_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">y_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">z_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
+
+        <span class="n">x_ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">y_ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">z_ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="n">x_ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+        <span class="n">y_ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+        <span class="n">z_ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+
+        <span class="n">x_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="n">y_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+        <span class="n">z_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">)</span>
+
+        <span class="n">proj</span> <span class="o">=</span> <span class="n">StereographicProjection</span><span class="p">()</span>
+
+        <span class="n">sector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">point_group</span><span class="o">.</span><span class="n">fundamental_sector</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="n">_closed_edges_in_hemisphere</span><span class="p">(</span><span class="n">sector</span><span class="o">.</span><span class="n">edges</span><span class="p">,</span> <span class="n">sector</span><span class="p">)</span>
+        <span class="n">x_ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="n">y_ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="n">z_ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">_get_ipf_axes_labels</span><span class="p">(</span><span class="n">sector</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">symmetry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">point_group</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="o">*</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">sector</span><span class="o">.</span><span class="n">vertices</span><span class="p">)):</span>
+            <span class="n">x_ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+            <span class="n">y_ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+            <span class="n">z_ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+
+        <span class="n">oris</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">x_oris</span> <span class="o">=</span> <span class="p">(</span><span class="n">oris</span> <span class="o">*</span> <span class="n">Vector3d</span><span class="o">.</span><span class="n">xvector</span><span class="p">())</span><span class="o">.</span><span class="n">in_fundamental_sector</span><span class="p">(</span><span class="n">oris</span><span class="o">.</span><span class="n">symmetry</span><span class="p">)</span>
+        <span class="n">y_oris</span> <span class="o">=</span> <span class="p">(</span><span class="n">oris</span> <span class="o">*</span> <span class="n">Vector3d</span><span class="o">.</span><span class="n">yvector</span><span class="p">())</span><span class="o">.</span><span class="n">in_fundamental_sector</span><span class="p">(</span><span class="n">oris</span><span class="o">.</span><span class="n">symmetry</span><span class="p">)</span>
+        <span class="n">z_oris</span> <span class="o">=</span> <span class="p">(</span><span class="n">oris</span> <span class="o">*</span> <span class="n">Vector3d</span><span class="o">.</span><span class="n">zvector</span><span class="p">())</span><span class="o">.</span><span class="n">in_fundamental_sector</span><span class="p">(</span><span class="n">oris</span><span class="o">.</span><span class="n">symmetry</span><span class="p">)</span>
+
+        <span class="n">x_scatter</span> <span class="o">=</span> <span class="n">x_ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">x_oris</span><span class="p">))</span>
+        <span class="n">y_scatter</span> <span class="o">=</span> <span class="n">y_ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">y_oris</span><span class="p">))</span>
+        <span class="n">z_scatter</span> <span class="o">=</span> <span class="n">z_ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">z_oris</span><span class="p">))</span>
+
+        <span class="n">sliders</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Slider</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rotate_to</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">slider</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">slider</span> <span class="ow">in</span> <span class="n">sliders</span><span class="p">],</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">oris</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">x_oris</span> <span class="o">=</span> <span class="p">(</span><span class="n">oris</span> <span class="o">*</span> <span class="n">Vector3d</span><span class="o">.</span><span class="n">xvector</span><span class="p">())</span><span class="o">.</span><span class="n">in_fundamental_sector</span><span class="p">(</span><span class="n">oris</span><span class="o">.</span><span class="n">symmetry</span><span class="p">)</span>
+            <span class="n">y_oris</span> <span class="o">=</span> <span class="p">(</span><span class="n">oris</span> <span class="o">*</span> <span class="n">Vector3d</span><span class="o">.</span><span class="n">yvector</span><span class="p">())</span><span class="o">.</span><span class="n">in_fundamental_sector</span><span class="p">(</span><span class="n">oris</span><span class="o">.</span><span class="n">symmetry</span><span class="p">)</span>
+            <span class="n">z_oris</span> <span class="o">=</span> <span class="p">(</span><span class="n">oris</span> <span class="o">*</span> <span class="n">Vector3d</span><span class="o">.</span><span class="n">zvector</span><span class="p">())</span><span class="o">.</span><span class="n">in_fundamental_sector</span><span class="p">(</span><span class="n">oris</span><span class="o">.</span><span class="n">symmetry</span><span class="p">)</span>
+            <span class="n">x_scatter</span><span class="o">.</span><span class="n">set_offsets</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">x_oris</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">y_scatter</span><span class="o">.</span><span class="n">set_offsets</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">y_oris</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">z_scatter</span><span class="o">.</span><span class="n">set_offsets</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">vector2xy</span><span class="p">(</span><span class="n">z_oris</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw_idle</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tilt_axis</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">):</span>
+            <span class="n">slider_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
+
+            <span class="n">tilt_slider</span> <span class="o">=</span> <span class="n">Slider</span><span class="p">(</span>
+                <span class="n">slider_ax</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Tilt axis </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> angle [deg]&quot;</span><span class="p">,</span>
+                <span class="n">valmin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">tilt_axis</span><span class="o">.</span><span class="n">min</span><span class="p">),</span>
+                <span class="n">valmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">tilt_axis</span><span class="o">.</span><span class="n">max</span><span class="p">),</span>
+                <span class="n">valinit</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">tilt_axis</span><span class="o">.</span><span class="n">angle</span><span class="p">),</span>
+                <span class="n">valfmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;#cc7000&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">tilt_slider</span><span class="o">.</span><span class="n">on_changed</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
+            <span class="n">sliders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tilt_slider</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">sliders</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sample.plot_angle_with">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.plot_angle_with">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_angle_with</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">zone_axis</span><span class="p">:</span> <span class="n">Miller</span><span class="p">,</span>
+        <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">use_mean_orientation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Make a plot of similarity score as function of tilt angle(s).</span>
+
+<span class="sd">        :param zone_axis: Zone axis to calculate for</span>
+<span class="sd">        :type zone_axis: Miller</span>
+<span class="sd">        :param resolution: Angular resolution of the tilt axes, in degrees, defaults to 1.0</span>
+<span class="sd">        :type resolution: float, optional</span>
+<span class="sd">        :param use_mean_orientation: Whether to perform optimization using the mean orientation of the sample(True) or the mean angle with the zone axis(False), defaults to False</span>
+<span class="sd">        :type use_mean_orientation: bool, optional</span>
+<span class="sd">        :raises NotImplementedError: If more than 2 tilt axes are present, as up to 2 are supported</span>
+<span class="sd">        :return: Line plot or colormap, depending on the number of tilt angles</span>
+<span class="sd">        :rtype: plt.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">use_mean_orientation</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimize_mean_orientation_func</span><span class="p">(</span><span class="n">zone_axis</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimize_angle_with_func</span><span class="p">(</span><span class="n">zone_axis</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">),</span> <span class="n">resolution</span>
+            <span class="p">)</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">score</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">angles</span><span class="p">]</span>
+
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">scores</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Tilt angle [deg]&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Mean angle with [</span><span class="si">{</span><span class="n">zone_axis</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">zone_axis</span><span class="o">.</span><span class="n">v</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">zone_axis</span><span class="o">.</span><span class="n">w</span><span class="si">}</span><span class="s2">]&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">angles_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">),</span> <span class="n">resolution</span>
+            <span class="p">)</span>
+            <span class="n">angles_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">),</span> <span class="n">resolution</span>
+            <span class="p">)</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">score</span><span class="p">((</span><span class="n">angle_1</span><span class="p">,</span> <span class="n">angle_2</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">angle_2</span> <span class="ow">in</span> <span class="n">angles_2</span>
+                <span class="k">for</span> <span class="n">angle_1</span> <span class="ow">in</span> <span class="n">angles_1</span>
+            <span class="p">]</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">angles_2</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">angles_1</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                <span class="n">scores</span><span class="p">,</span>
+                <span class="n">extent</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">angles_1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">angles_1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">angles_2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">angles_2</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;1st tilt angle [deg]&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;2nd tilt angle&quot;</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Only 1 and 2 tilt axes are supported for this plot&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_rotation</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="Sample.to_navigator">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.to_navigator">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_navigator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Signal1D</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a IPF-z colormap as a hyperspy signal</span>
+
+<span class="sd">        :return: IPF-z</span>
+<span class="sd">        :rtype: Signal1D</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ipfkey</span> <span class="o">=</span> <span class="n">IPFColorKeyTSL</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="o">.</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">Vector3d</span><span class="o">.</span><span class="n">zvector</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="n">float_rgb</span> <span class="o">=</span> <span class="n">ipfkey</span><span class="o">.</span><span class="n">orientation2color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="p">)</span>
+        <span class="n">int_rgb</span> <span class="o">=</span> <span class="p">(</span><span class="n">float_rgb</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">Signal1D</span><span class="p">(</span><span class="n">int_rgb</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">change_dtype</span><span class="p">(</span><span class="s2">&quot;rgb8&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
+<div class="viewcode-block" id="Sample.to_signal">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.to_signal">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Signal1D</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hyperspy signal containing the quaternion data of the orientations at each sample point</span>
+
+<span class="sd">        :return: Quaternion data</span>
+<span class="sd">        :rtype: Signal1D</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Signal1D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sample.angle_with">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.angle_with">[docs]</a>
+    <span class="k">def</span> <span class="nf">angle_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone_axis</span><span class="p">:</span> <span class="n">Miller</span><span class="p">,</span> <span class="n">degrees</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the angle between the optical axis and the target zone axis, </span>
+<span class="sd">        for all pixels in the sample.</span>
+
+<span class="sd">        :param zone_axis: Zone axis to calculate for</span>
+<span class="sd">        :type zone_axis: Miller</span>
+<span class="sd">        :param degrees: Whether to return output in degrees(True) or radians(False), defaults to True</span>
+<span class="sd">        :type degrees: bool, optional</span>
+<span class="sd">        :return: Array of angles at all points in the sample</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vecs</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orientations</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">optical_axis</span><span class="p">)</span><span class="o">.</span><span class="n">in_fundamental_sector</span><span class="p">()</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">_jit_angle_with</span><span class="p">(</span><span class="n">vecs</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">zone_axis</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+            <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">angles</span></div>
+
+
+<div class="viewcode-block" id="Sample.mean_zone_axis">
+<a class="viewcode-back" href="../../generated/tiltlib.sample.Sample.html#tiltlib.sample.Sample.mean_zone_axis">[docs]</a>
+    <span class="k">def</span> <span class="nf">mean_zone_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Miller</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the mean orientation in the sample, and return the zone axis.</span>
+<span class="sd">        This is mostly useful for single-grain or cropped samples.</span>
+
+<span class="sd">        :return: Zone axis</span>
+<span class="sd">        :rtype: Miller</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orientations</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">optical_axis_miller</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_optimize_angle_with_func</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">zone_axis</span><span class="p">:</span> <span class="n">Miller</span><span class="p">,</span> <span class="n">degrees</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rotate_to</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="n">degrees</span><span class="p">)</span>
+            <span class="n">aw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle_with</span><span class="p">(</span><span class="n">zone_axis</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">aw</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">optimize</span>
+
+    <span class="k">def</span> <span class="nf">_optimize_mean_orientation_func</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">zone_axis</span><span class="p">:</span> <span class="n">Miller</span><span class="p">,</span> <span class="n">degrees</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_rotations</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rotate_to</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="n">degrees</span><span class="p">)</span>
+            <span class="n">ro</span> <span class="o">=</span> <span class="n">o</span> <span class="o">*</span> <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span>
+            <span class="n">mean_zone</span> <span class="o">=</span> <span class="p">(</span><span class="n">ro</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">optical_axis_miller</span><span class="p">)</span><span class="o">.</span><span class="n">in_fundamental_sector</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">mean_zone</span><span class="o">.</span><span class="n">angle_with</span><span class="p">(</span><span class="n">zone_axis</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="n">degrees</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">optimize</span></div>
+
+
+
+<span class="nd">@njit</span>
+<span class="k">def</span> <span class="nf">_jit_angle_with</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="n">dot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vecs</span> <span class="o">*</span> <span class="n">target</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">target</span><span class="p">)))</span>
+    <span class="n">cosines</span> <span class="o">=</span> <span class="n">dot</span> <span class="o">/</span> <span class="n">norm</span>
+    <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">cosines</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">angles</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Viljar Femoen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

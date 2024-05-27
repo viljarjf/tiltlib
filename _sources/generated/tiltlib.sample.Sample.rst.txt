@@ -1,0 +1,53 @@
+tiltlib.sample.Sample
+=====================
+
+.. currentmodule:: tiltlib.sample
+
+.. autoclass:: Sample
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Sample.TEM_frame_to_sample_frame
+      ~Sample.__init__
+      ~Sample.angle_with
+      ~Sample.as_matrix
+      ~Sample.crop
+      ~Sample.find_tilt_angles
+      ~Sample.from_crystal_map
+      ~Sample.mean_zone_axis
+      ~Sample.plot
+      ~Sample.plot_angle_with
+      ~Sample.plot_interactive
+      ~Sample.plot_orientations
+      ~Sample.plot_orientations_interactive
+      ~Sample.reset_rotation
+      ~Sample.rotate
+      ~Sample.rotate_to
+      ~Sample.rotation_matrix
+      ~Sample.sample_frame_to_TEM_frame
+      ~Sample.to_matrix
+      ~Sample.to_navigator
+      ~Sample.to_signal
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Sample.angles
+      ~Sample.orientations
+   
+   

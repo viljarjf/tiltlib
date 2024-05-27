@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zone axis alignment &mdash; tiltlib 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tilt axis identification" href="tilt_axis_identification.html" />
+    <link rel="prev" title="Basic Usage" href="basic_usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tiltlib
+          </a>
+              <div class="version">
+                0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../usage.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Zone axis alignment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Load-data">Load data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Grain-selection">Grain selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Find-the-tilt-angles">Find the tilt angles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Twin-alignment">Twin alignment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Plot-the-optimization-landscape">Plot the optimization landscape</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tilt_axis_identification.html">Tilt axis identification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../generated/tiltlib.html">tiltlib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contribution.html">Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tiltlib</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../usage.html">Usage</a></li>
+      <li class="breadcrumb-item active">Zone axis alignment</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/zone_axis_alignment.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Zone-axis-alignment">
+<h1>Zone axis alignment<a class="headerlink" href="#Zone-axis-alignment" title="Link to this heading"></a></h1>
+<p>In this notebook, we will calculate the necessary angles to tilt the sample such that a given zone axis is aligned with the optical axis.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the necessary packages</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">orix.vector</span> <span class="kn">import</span> <span class="n">Vector3d</span><span class="p">,</span> <span class="n">Miller</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">tiltlib</span> <span class="kn">import</span> <span class="n">Axis</span><span class="p">,</span> <span class="n">Sample</span>
+</pre></div>
+</div>
+</div>
+<section id="Load-data">
+<h2>Load data<a class="headerlink" href="#Load-data" title="Link to this heading"></a></h2>
+<p>We use Orix’s austenite crystal map, and a double-tilt sample holder with axes offset by 30 degrees to the scan.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">orix.data</span> <span class="kn">import</span> <span class="n">sdss_austenite</span>
+
+<span class="c1"># This is the raw data we will use</span>
+<span class="n">raw_xmap</span> <span class="o">=</span> <span class="n">sdss_austenite</span><span class="p">(</span><span class="n">allow_download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Define the tilt axes of the sample holder.</span>
+<span class="c1"># If these are not known, refer to the `tilt_axis_identification.ipynb` example notebook.</span>
+<span class="n">x_tilt_axis</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span>
+    <span class="n">Vector3d</span><span class="o">.</span><span class="n">xvector</span><span class="p">()</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">Vector3d</span><span class="o">.</span><span class="n">zvector</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mi">30</span><span class="p">)),</span>
+    <span class="nb">min</span><span class="o">=-</span><span class="mi">30</span><span class="p">,</span>
+    <span class="nb">max</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">angle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">intrinsic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">y_tilt_axis</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span>
+    <span class="n">Vector3d</span><span class="o">.</span><span class="n">yvector</span><span class="p">()</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">Vector3d</span><span class="o">.</span><span class="n">zvector</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mi">30</span><span class="p">)),</span>
+    <span class="nb">min</span><span class="o">=-</span><span class="mi">30</span><span class="p">,</span>
+    <span class="nb">max</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">angle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">intrinsic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Initialize the sample object</span>
+<span class="n">sample</span> <span class="o">=</span> <span class="n">Sample</span><span class="o">.</span><span class="n">from_crystal_map</span><span class="p">(</span><span class="n">raw_xmap</span><span class="p">,</span> <span class="p">[</span><span class="n">x_tilt_axis</span><span class="p">,</span> <span class="n">y_tilt_axis</span><span class="p">])</span>
+
+<span class="n">figure</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_3_0.png" src="../_images/tutorials_zone_axis_alignment_3_0.png" />
+</div>
+</div>
+<p>If you have your own data, replace the axes and crystal map with your own. Remember to assign the correct initial tilt angles to the axes.</p>
+</section>
+<section id="Grain-selection">
+<h2>Grain selection<a class="headerlink" href="#Grain-selection" title="Link to this heading"></a></h2>
+<p>We choose a grain as a target for our optimization with a hyperspy ROI. Both a box ROI and a circle ROI are supported.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For example purposes, we have used %matplotlib inline. This makes the plot static.</span>
+<span class="c1"># For an interactive experience, use e.g. %matplotlib qt5 (needs PyQt5 installed)</span>
+
+<span class="c1"># Make a navigation signal, to have an interactive ROI.</span>
+<span class="n">nav</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">to_navigator</span><span class="p">()</span>
+<span class="n">nav</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+
+<span class="kn">from</span> <span class="nn">hyperspy.roi</span> <span class="kn">import</span> <span class="n">RectangularROI</span>
+
+<span class="n">box</span> <span class="o">=</span> <span class="n">RectangularROI</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">66</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">83</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">72</span><span class="p">)</span>
+<span class="n">box</span><span class="o">.</span><span class="n">interactive</span><span class="p">(</span><span class="n">nav</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Signal2D, title: , dimensions: (|11, 6)&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_6_1.png" src="../_images/tutorials_zone_axis_alignment_6_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">box_crop</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
+<span class="n">box_crop</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">box_crop</span><span class="o">.</span><span class="n">mean_zone_axis</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Miller (1,), point group m-3m, uvw
+[[  2. -17.  20.]]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_7_1.png" src="../_images/tutorials_zone_axis_alignment_7_1.png" />
+</div>
+</div>
+<p>From the green color, observe that the chosen grain is quite close to [1 0 1]. We will try to align it to that zone axis.</p>
+</section>
+<section id="Find-the-tilt-angles">
+<h2>Find the tilt angles<a class="headerlink" href="#Find-the-tilt-angles" title="Link to this heading"></a></h2>
+<p>Now, we choose a miller index, here [1 0 1], and find the angles necessary for aligning the grain to that zone axis.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">target</span> <span class="o">=</span> <span class="n">Miller</span><span class="p">(</span><span class="n">uvw</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">phase</span><span class="o">=</span><span class="n">sample</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The chosen grain is quite uniform. Therefore, we can choose to optimize using the mean orientation, instead of using the mean angle after using all orientations. This can provide significant speedup.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">box_angles</span> <span class="o">=</span> <span class="n">box_crop</span><span class="o">.</span><span class="n">find_tilt_angles</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">use_mean_orientation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">box_angles</span><span class="w"> </span><span class="si">= }</span><span class="s2"> degrees&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+box_angles = array([0.41907898, 5.89399747]) degrees
+</pre></div></div>
+</div>
+<p>We can verify the results by calculating the mean zone axis of the crop after rotation, and plotting the sample to see the green color we expect.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">box_crop</span><span class="o">.</span><span class="n">rotate_to</span><span class="p">(</span><span class="o">*</span><span class="n">box_angles</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">box_crop</span><span class="o">.</span><span class="n">mean_zone_axis</span><span class="p">())</span>
+
+<span class="n">sample</span><span class="o">.</span><span class="n">rotate_to</span><span class="p">(</span><span class="o">*</span><span class="n">box_angles</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">figure</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Miller (1,), point group m-3m, uvw
+[[ 0. -1.  1.]]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_14_1.png" src="../_images/tutorials_zone_axis_alignment_14_1.png" />
+</div>
+</div>
+<p>The grain was indeed close to <span class="math notranslate nohighlight">\(\left[1\,0\,1\right]\)</span>, since we only needed to tilt about 5 degrees. Note that we found the symmetrically equivalent <span class="math notranslate nohighlight">\(\left[0\,\bar{1}\,1\right]\)</span> rather than <span class="math notranslate nohighlight">\(\left[1\,0\,1\right]\)</span>.</p>
+</section>
+<section id="Twin-alignment">
+<h2>Twin alignment<a class="headerlink" href="#Twin-alignment" title="Link to this heading"></a></h2>
+<p>Next, we will try to align two twin grains to the same zone simultaneously.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nav</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">to_navigator</span><span class="p">()</span>
+<span class="n">nav</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+
+<span class="kn">from</span> <span class="nn">hyperspy.roi</span> <span class="kn">import</span> <span class="n">CircleROI</span>
+
+<span class="n">circle</span> <span class="o">=</span> <span class="n">CircleROI</span><span class="p">(</span><span class="n">cx</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">cy</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">r_inner</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Ignore an error which does not affect us</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">circle</span><span class="o">.</span><span class="n">interactive</span><span class="p">(</span><span class="n">nav</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">DTypePromotionError</span><span class="p">:</span>
+    <span class="k">pass</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_17_0.png" src="../_images/tutorials_zone_axis_alignment_17_0.png" />
+</div>
+</div>
+<p>These should be <span class="math notranslate nohighlight">\(\Sigma3\)</span> twins, and should share a <span class="math notranslate nohighlight">\(\left[1\,0\,1\right]\)</span> zone. We use that as target.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">circle_crop</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">Miller</span><span class="p">(</span><span class="n">uvw</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">phase</span><span class="o">=</span><span class="n">sample</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>To align on multiple grains simultaneously, we no longer want to use the mean orientation. Since we have two populations of orientations, the mean is not representative of either. Therefore, we set <code class="docutils literal notranslate"><span class="pre">use_mean_orientation</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>, which is the default value.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">circle_angles</span> <span class="o">=</span> <span class="n">circle_crop</span><span class="o">.</span><span class="n">find_tilt_angles</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">use_mean_orientation</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">circle_angles</span><span class="w"> </span><span class="si">= }</span><span class="s2"> degrees&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+circle_angles = array([-12.86982858, -17.7328452 ]) degrees
+</pre></div></div>
+</div>
+<p>Once again, we can verify by plotting the IPF colormap after tilting, and observe that both grains are indeed aligned with <span class="math notranslate nohighlight">\(\left[1\,0\,1\right]\)</span></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sample</span><span class="o">.</span><span class="n">rotate_to</span><span class="p">(</span><span class="o">*</span><span class="n">circle_angles</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_23_0.png" src="../_images/tutorials_zone_axis_alignment_23_0.png" />
+</div>
+</div>
+<p>Additionally, we can show how the mean is not representative (before alignment, at least), by adding it to the z-IPF in red:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig_before</span> <span class="o">=</span> <span class="n">circle_crop</span><span class="o">.</span><span class="n">plot_orientations</span><span class="p">()</span>
+<span class="n">mean_zone</span> <span class="o">=</span> <span class="n">circle_crop</span><span class="o">.</span><span class="n">mean_zone_axis</span><span class="p">()</span>
+<span class="n">fig_before</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">mean_zone</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">fig_before</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Before tilting&quot;</span><span class="p">)</span>
+
+<span class="n">circle_crop</span><span class="o">.</span><span class="n">rotate_to</span><span class="p">(</span><span class="o">*</span><span class="n">circle_angles</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig_after</span> <span class="o">=</span> <span class="n">circle_crop</span><span class="o">.</span><span class="n">plot_orientations</span><span class="p">()</span>
+<span class="n">mean_zone</span> <span class="o">=</span> <span class="n">circle_crop</span><span class="o">.</span><span class="n">mean_zone_axis</span><span class="p">()</span>
+<span class="n">fig_after</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">mean_zone</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">fig_after</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;After tilting&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 0.98, &#39;After tilting&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_25_1.png" src="../_images/tutorials_zone_axis_alignment_25_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_25_2.png" src="../_images/tutorials_zone_axis_alignment_25_2.png" />
+</div>
+</div>
+</section>
+<section id="Plot-the-optimization-landscape">
+<h2>Plot the optimization landscape<a class="headerlink" href="#Plot-the-optimization-landscape" title="Link to this heading"></a></h2>
+<p>Sometimes, the alignment algorithm will encounter degenerate minima in the optimization landscape. This can be caused by symmetrically equivalent zones being available within the tilt range of the axes. However, tiltlib does not check if this is the case. We can check ourselves by plotting the optimization landscape.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Degenerate minima</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">Miller</span><span class="p">(</span><span class="n">uvw</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">phase</span><span class="o">=</span><span class="n">sample</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">box_crop</span><span class="o">.</span><span class="n">plot_angle_with</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_27_0.png" src="../_images/tutorials_zone_axis_alignment_27_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Single minimum</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">Miller</span><span class="p">(</span><span class="n">uvw</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">phase</span><span class="o">=</span><span class="n">sample</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">circle_crop</span><span class="o">.</span><span class="n">plot_angle_with</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_28_0.png" src="../_images/tutorials_zone_axis_alignment_28_0.png" />
+</div>
+</div>
+<p>We can also show how using the mean orientation would look like for the twins, which should yield a completely different optimization landscape:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">circle_crop</span><span class="o">.</span><span class="n">plot_angle_with</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">use_mean_orientation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_zone_axis_alignment_30_0.png" src="../_images/tutorials_zone_axis_alignment_30_0.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="basic_usage.html" class="btn btn-neutral float-left" title="Basic Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tilt_axis_identification.html" class="btn btn-neutral float-right" title="Tilt axis identification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Viljar Femoen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
