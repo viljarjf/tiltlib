@@ -107,8 +107,7 @@ class Sample(SampleHolder):
         :type zone_axis: Miller
         :param degrees: Whether to return degrees(True) or radians(False), defaults to True
         :type degrees: bool, optional
-        :param use_mean_orientation: Whether to perform optimization using the mean orientation 
-        of the sample(True) or the mean angle with the zone axis(False), defaults to False
+        :param use_mean_orientation: Whether to perform optimization using the mean orientation of the sample(True) or the mean angle with the zone axis(False), defaults to False
         :type use_mean_orientation: bool, optional
         :return: Tilt angles
         :rtype: tuple[float, ...]
@@ -186,8 +185,7 @@ class Sample(SampleHolder):
     ) -> tuple[plt.Figure, Slider]:
         """Make a IPF colormap plot with a slider for the tilt angle of each tilt axis
 
-        :return: Figure and sliders. Returning the slider avoids their functionality 
-        being deleted when the function returns
+        :return: Figure and sliders. Returning the slider avoids their functionality being deleted when the function returns
         :rtype: tuple[plt.Figure, Slider]
         """
 
@@ -244,8 +242,7 @@ class Sample(SampleHolder):
     def plot_orientations_interactive(self) -> tuple[plt.Figure, Slider]:
         """Interactive scatterplot of the orientations, with sliders to control the tilt axes
 
-        :return: Figure and sliders. Returning the slider avoids their functionality 
-        being deleted when the function returns
+        :return: Figure and sliders. Returning the slider avoids their functionality being deleted when the function returns
         :rtype: tuple[plt.Figure, Slider]
         """
         fig = plt.figure(layout="constrained")
@@ -330,8 +327,7 @@ class Sample(SampleHolder):
         :type zone_axis: Miller
         :param resolution: Angular resolution of the tilt axes, in degrees, defaults to 1.0
         :type resolution: float, optional
-        :param use_mean_orientation: Whether to perform optimization using the mean orientation 
-        of the sample(True) or the mean angle with the zone axis(False), defaults to False
+        :param use_mean_orientation: Whether to perform optimization using the mean orientation of the sample(True) or the mean angle with the zone axis(False), defaults to False
         :type use_mean_orientation: bool, optional
         :raises NotImplementedError: If more than 2 tilt axes are present, as up to 2 are supported
         :return: Line plot or colormap, depending on the number of tilt angles
