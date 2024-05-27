@@ -8,6 +8,21 @@ from orix.vector import Vector3d
 
 @dataclass
 class Axis:
+    """Dataclass for handling axis rotations
+
+    :param direction: Direction of tilt axis in the sample reference frame
+    :type direction: Vector3d
+    :param min: Minimum possible tilt angle
+    :type min: float
+    :param max: Maximum possible tilt angle
+    :type max: float
+    :param angle: Initial tilt angle
+    :type angle: 0, optional
+    :param degrees: Whether the given angles are in degrees(True) or radians(False), defaults to True
+    :type degrees: bool, optional
+    :param intrinsic: Whether the axis rotation is intrinsic(True) or extrinsic(False), defaults to False
+    :type intrinsic: bool, optional
+    """
     direction: Vector3d
     min: float
     max: float
@@ -49,5 +64,5 @@ class Axis:
     def extrinsic(self, b: bool):
         self.intrinsic = not b
 
-    def copy(self):
+    def copy(self) -> "Axis":
         return copy.copy(self)
