@@ -13,7 +13,7 @@ class SampleHolder:
 
         :param axes: Tilt axes, in order, defaults to None
         :type axes: list[Axis], optional
-        :raises ValueError: If :code:axes contains a non-:code:Axis instance
+        :raises ValueError: If :code:`axes` contains a non-:code:`Axis` instance
         """
         if axes is None:
             axes = []
@@ -74,6 +74,8 @@ class SampleHolder:
     def rotate_to(self, *angles: float, degrees: bool = False):
         """Sets the angles of all rotation axes to the given angles
 
+        :param angles: tilt angles, in order of tilt axes
+        :type angles: float
         :param degrees: Whether angles are in degrees(True) or radians(False), defaults to False
         :type degrees: bool, optional
         """
@@ -86,6 +88,8 @@ class SampleHolder:
     def rotate(self, *angles: float, degrees: bool = False):
         """Rotates the sample holder by the given angles from the current position
 
+        :param angles: tilt angles, in order of tilt axes
+        :type angles: float
         :param degrees: Whether angles are in degrees(True) or radians(False), defaults to False
         :type degrees: bool, optional
         """

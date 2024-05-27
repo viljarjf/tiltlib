@@ -12,8 +12,8 @@ A python library for virtually tilting a TEM sample, and predicting tilt angles 
    :maxdepth: 1
    :caption: Contents:
 
-   api
    usage
+   API Reference <api>
    contribution
 
 Indices and tables
